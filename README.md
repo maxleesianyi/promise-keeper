@@ -1,0 +1,71 @@
+# Promise Keeper
+
+Promise Keeper is a playful, mobile-first relationship assistant that turns commitments hidden in everyday messages into organised, editable promises. It was created for the OpenAI Build Week Hackathon.
+
+## The idea
+
+Everyday messages can hide important commitments: picking up dog food, packing swimming gear, or booking a special dinner. Normal task apps expect people to interpret and rewrite those messages themselves. Promise Keeper uses GPT-5.6 to produce an editable draft, then lets the user decide what to save and whether it was completed or missed.
+
+The demo uses a fictional husband-and-wife scenario. The broader idea is suitable for couples, families, roommates, and caregivers.
+
+## MVP features
+
+- Paste a message or select a fictional sample.
+- GPT-5.6 extracts a promise, due timing, relevant person, preparation, category, and confidence.
+- Edit every field before saving.
+- Store confirmed promise details locally in the browser.
+- Mark promises completed or missed.
+- Add $100 per missed promise and unlock a pre-agreed $300 spa voucher at three misses.
+- Copy a warm reward message; no automatic purchase or message is sent.
+
+## Safety and privacy
+
+- Do not submit confidential or highly sensitive conversations.
+- The app displays a privacy note beside the input.
+- Original pasted message text is not retained after analysis.
+- AI drafts can be wrong and must be reviewed before saving.
+- The playful meter is mutually agreed, optional product framing—not a judgement of relationship health.
+
+## Run locally
+
+1. Install Node.js 22 or later.
+2. In this project folder, install dependencies with `pnpm install`.
+3. Copy `.env.example` to `.env.local` and add your OpenAI API key:
+
+   ```text
+   OPENAI_API_KEY=your_key_here
+   ```
+
+4. Start the project with `pnpm dev`.
+5. Open the local address shown in your terminal.
+
+Without an API key, the three built-in fictional samples remain available through a deliberately limited demo fallback. Add an API key before presenting the real GPT-powered experience.
+
+## How the app works
+
+The browser sends a pasted message to a protected server-side route. That route calls the OpenAI Responses API with GPT-5.6 and returns only a structured draft. The browser saves only the fields the user confirms. The OpenAI key stays on the server and must never be committed to GitHub.
+
+## Testing
+
+Follow [TESTING.md](TESTING.md) for the complete demo and safety checks.
+
+## Build Week records
+
+- [BUILD_WEEK_CHANGELOG.md](BUILD_WEEK_CHANGELOG.md) records features built during the event.
+- [DECISIONS.md](DECISIONS.md) records product and scope decisions.
+
+## Known limitations
+
+This MVP has no accounts, database, shared partner view, calendar connection, push notifications, Telegram sending, WhatsApp access, screenshot input, or payment flow. Those are intentional exclusions to keep the core promise-to-follow-through loop reliable.
+
+## Codex and GPT-5.6
+
+Codex accelerated the project by helping refine the product scope, set up the app, implement the interface and interaction flow, create documentation, and test the experience. GPT-5.6 powers the core behaviour: extracting structured commitments from natural conversation.
+
+## Demo link
+
+Add the live Codex Sites URL here after deployment.
+
+## Hackathon reminder
+
+Before submitting, retrieve the `/feedback` Codex Session ID from the main Codex session where the core functionality was built.
