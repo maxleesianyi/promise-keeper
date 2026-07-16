@@ -55,7 +55,7 @@ const samples = [
 
 function getStoredPromises() {
   if (typeof window === "undefined") return starterPromises;
-  const saved = window.localStorage.getItem("promise-keeper-promises");
+  const saved = window.localStorage.getItem("do-already-promises");
   if (!saved) return starterPromises;
   try {
     return JSON.parse(saved) as PromiseItem[];
@@ -73,7 +73,7 @@ export default function Home() {
 
   useEffect(() => setPromises(getStoredPromises()), []);
   useEffect(() => {
-    window.localStorage.setItem("promise-keeper-promises", JSON.stringify(promises));
+    window.localStorage.setItem("do-already-promises", JSON.stringify(promises));
   }, [promises]);
   useEffect(() => {
     const loadTelegramPromises = async () => {
@@ -156,7 +156,7 @@ export default function Home() {
       <section className="phone-frame">
         <header className="topbar">
           <div>
-            <p className="eyebrow">PROMISE KEEPER</p>
+            <p className="eyebrow">DO ALREADY?</p>
             <h1>Hey, you.</h1>
           </div>
           <button className="reset-button" onClick={resetDemo} aria-label="Reset demo data">↻</button>

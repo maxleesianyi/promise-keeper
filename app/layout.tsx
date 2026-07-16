@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Promise Keeper",
+  title: "Do Already?",
   description: "A playful assistant for keeping the promises hidden in everyday messages.",
 };
 

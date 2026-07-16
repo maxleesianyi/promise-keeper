@@ -1,6 +1,6 @@
-# Promise Keeper
+# Do Already?
 
-Promise Keeper is a playful, mobile-first relationship assistant that turns commitments hidden in everyday messages into organised, editable promises. It was created for the OpenAI Build Week Hackathon.
+Do Already? is a playful, mobile-first relationship assistant that turns commitments hidden in everyday messages into organised, editable promises. It was created for the OpenAI Build Week Hackathon.
 
 ## The idea
 
