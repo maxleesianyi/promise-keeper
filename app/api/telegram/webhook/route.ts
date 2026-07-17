@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { ensurePromiseSchema, getDb } from "../../../../db";
 import { promises } from "../../../../db/schema";
 import { extractPromise } from "../../../../lib/promise-extraction";
-import { answerCallback, sendApprovalCard, updateApprovalCard } from "../../../../lib/telegram";
+import { answerCallback, sendApprovalCard, sendSetupReply, updateApprovalCard } from "../../../../lib/telegram";
 
 type Update = {
   message?: { chat: { id: number }; from?: { id: number }; text?: string };
@@ -21,6 +21,14 @@ export async function POST(request: Request) {
   if (update.callback_query) return callback(update);
 
   const message = update.message;
+  if (message?.text === "/doalready_setup" && same(message.from?.id, process.env.TELEGRAM_USER_ID)) {
+    try {
+      await sendSetupReply(message.chat.id);
+      return Response.json({ ok: true, outcome: "setup_reply_sent" });
+    } catch (error) {
+      return Response.json({ ok: true, outcome: "setup_reply_failed", error: error instanceof Error ? error.message : "Unknown error" });
+    }
+  }
   const isApprovedSender = same(message?.from?.id, process.env.TELEGRAM_WIFE_USER_ID);
   const isConfiguredDemoGroup = same(message?.chat.id, process.env.TELEGRAM_DEMO_CHAT_ID);
   const isYourTemporaryTestGroup = same(message?.from?.id, process.env.TELEGRAM_USER_ID) && Boolean(message?.chat && message.chat.id < 0);
