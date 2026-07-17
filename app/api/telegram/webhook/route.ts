@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   try {
     await ensurePromiseSchema();
     const extracted = await extractPromise(message.text);
-    if (!extracted.promise || extracted.promise.confidence !== "High") return Response.json({ ok: true });
+    if (!extracted.promise || extracted.promise.confidence !== "High") return Response.json({ ok: true, outcome: "not_a_high_confidence_promise" });
 
     const id = crypto.randomUUID();
     await getDb().insert(promises).values({
@@ -38,11 +38,11 @@ export async function POST(request: Request) {
       approvalState: "pending",
     });
     await sendApprovalCard({ id, title: extracted.promise.title, dueText: extracted.promise.dueText });
+    return Response.json({ ok: true, outcome: "approval_card_sent" });
   } catch (error) {
     console.error("Telegram promise capture failed", error);
+    return Response.json({ ok: true, outcome: "delivery_failed", error: error instanceof Error ? error.message : "Unknown error" });
   }
-
-  return Response.json({ ok: true });
 }
 
 async function callback(update: Update) {
