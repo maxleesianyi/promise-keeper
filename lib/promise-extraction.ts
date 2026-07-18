@@ -5,6 +5,12 @@ export type ExtractedPromise = {
   relevantPerson: string;
   preparation: string;
   confidence: "High" | "Medium" | "Low";
+  action: "new" | "update";
+  targetPromiseId: string;
+};
+
+export type ActivePromiseContext = Pick<ExtractedPromise, "title" | "category" | "dueText" | "relevantPerson" | "preparation"> & {
+  id: string;
 };
 
 const schema = {
@@ -20,7 +26,7 @@ const schema = {
         {
           type: "object",
           additionalProperties: false,
-          required: ["title", "category", "dueText", "relevantPerson", "preparation", "confidence"],
+          required: ["title", "category", "dueText", "relevantPerson", "preparation", "confidence", "action", "targetPromiseId"],
           properties: {
             title: { type: "string" },
             category: { type: "string", enum: ["Errand", "Preparation", "Important date", "Promise"] },
@@ -28,6 +34,8 @@ const schema = {
             relevantPerson: { type: "string" },
             preparation: { type: "string" },
             confidence: { type: "string", enum: ["High", "Medium", "Low"] },
+            action: { type: "string", enum: ["new", "update"] },
+            targetPromiseId: { type: "string" },
           },
         },
       ],
@@ -46,6 +54,8 @@ export function demoExtraction(message: string): ExtractedPromise | null {
       relevantPerson: "Jason",
       preparation: "Find swimsuit, towel, goggles, and a change of clothes.",
       confidence: "High",
+      action: "new",
+      targetPromiseId: "",
     };
   }
 
@@ -57,6 +67,8 @@ export function demoExtraction(message: string): ExtractedPromise | null {
       relevantPerson: "The Wife",
       preparation: "Pick up the usual brand.",
       confidence: "Medium",
+      action: "new",
+      targetPromiseId: "",
     };
   }
 
@@ -68,13 +80,15 @@ export function demoExtraction(message: string): ExtractedPromise | null {
       relevantPerson: "The Wife",
       preparation: "Ask for the preferred date, time, and restaurant.",
       confidence: "Low",
+      action: "new",
+      targetPromiseId: "",
     };
   }
 
   return null;
 }
 
-export async function extractPromise(message: string): Promise<{
+export async function extractPromise(message: string, activePromises: ActivePromiseContext[] = []): Promise<{
   promise: ExtractedPromise | null;
   message: string;
   mode: "ai" | "demo";
@@ -101,7 +115,11 @@ export async function extractPromise(message: string): Promise<{
     },
     body: JSON.stringify({
       model: "gpt-5.6-luna",
-      instructions: `You extract commitments from everyday messages for Do Already?. Today in Singapore is ${today}. Every commitment is assigned to the app user. Detect a clear promise or task, classify it, resolve dates only when supported by the text, otherwise use "No date yet". Use the name stated in the message for relevantPerson, otherwise "The Wife". Be concise. Return no promise for ordinary chat. Set confidence to High only when the message clearly asks the app user to do a specific, actionable task and the essential context is explicit. Set Medium when it might be a task but the intent, ownership, timing, or details need the user's judgment. Set Low for vague, conversational, or incomplete items that should not become a promise automatically.`,
+      instructions: `You extract commitments from everyday messages for Do Already?. Today in Singapore is ${today}. Every commitment is assigned to the app user. Detect a clear promise or task, classify it, resolve dates only when supported by the text, otherwise use "No date yet". Use the name stated in the message for relevantPerson, otherwise "The Wife". Be concise. Return no promise for ordinary chat. Set confidence to High only when the message clearly asks the app user to do a specific, actionable task and the essential context is explicit. Set Medium when it might be a task but the intent, ownership, timing, or details need the user's judgment. Set Low for vague, conversational, or incomplete items that should not become a promise automatically.
+
+Active tasks are supplied below. Before making a new task, check whether the message clearly adds an item to, removes an item from, or otherwise amends exactly one active task. Use action "update" only when the link is explicit, such as "oh I forgot, buy carrots as well" after a grocery task. For an update, targetPromiseId must match one supplied id exactly, and title must be the complete merged task, not just the new item. Preserve the existing due text, person, category, and preparation unless the message clearly changes them. Use High confidence only for an unambiguous update. Never guess an update from a vague reference. If a message might modify an active task but the target is unclear, return no promise rather than creating a duplicate. For a new task, use action "new" and targetPromiseId "".
+
+Active tasks JSON: ${JSON.stringify(activePromises)}`,
       input: message,
       text: {
         format: {

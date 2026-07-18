@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { ensurePromiseSchema, getDb } from "../../../../db";
 import { promises } from "../../../../db/schema";
 import { extractPromise } from "../../../../lib/promise-extraction";
@@ -38,11 +38,41 @@ export async function POST(request: Request) {
 
   try {
     await ensurePromiseSchema();
-    const extracted = await extractPromise(message.text);
+    const db = getDb();
+    const activeTasks = await db
+      .select()
+      .from(promises)
+      .where(and(eq(promises.approvalState, "saved"), inArray(promises.status, ["due", "needs-date"])));
+    const extracted = await extractPromise(message.text, activeTasks.map((task) => ({
+      id: task.id,
+      title: task.title,
+      category: task.category as "Errand" | "Preparation" | "Important date" | "Promise",
+      dueText: task.dueText,
+      relevantPerson: task.relevantPerson,
+      preparation: task.preparation,
+    })));
     if (!extracted.promise || extracted.promise.confidence === "Low") return Response.json({ ok: true, outcome: "not_confident_enough" });
 
+    if (extracted.promise.action === "update") {
+      const target = activeTasks.find((task) => task.id === extracted.promise?.targetPromiseId);
+      if (!target || extracted.promise.confidence !== "High") {
+        return Response.json({ ok: true, outcome: "update_not_clear_enough" });
+      }
+
+      await db.update(promises).set({
+        title: extracted.promise.title,
+        category: extracted.promise.category,
+        dueText: extracted.promise.dueText || target.dueText,
+        relevantPerson: extracted.promise.relevantPerson || target.relevantPerson,
+        preparation: extracted.promise.preparation || target.preparation,
+        confidence: extracted.promise.confidence,
+        updatedAt: new Date().toISOString(),
+      }).where(eq(promises.id, target.id));
+      return Response.json({ ok: true, outcome: "active_task_updated", taskId: target.id });
+    }
+
     const id = crypto.randomUUID();
-    await getDb().insert(promises).values({
+    await db.insert(promises).values({
       id,
       ...extracted.promise,
       status: extracted.promise.dueText === "No date yet" ? "needs-date" : "due",

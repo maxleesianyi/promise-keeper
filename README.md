@@ -4,7 +4,7 @@ Do Already? is a playful, mobile-first relationship assistant that turns commitm
 
 ## The idea
 
-Everyday messages can hide important commitments: picking up dog food, packing swimming gear, or booking a special dinner. Normal task apps expect people to interpret and rewrite those messages themselves. Promise Keeper uses GPT-5.6 to produce an editable draft, then lets the user decide what to save and whether it was completed or missed.
+Everyday messages can hide important commitments: picking up dog food, packing swimming gear, or booking a special dinner. Normal task apps expect people to interpret and rewrite those messages themselves. Do Already? uses GPT-5.6 to produce an editable draft, then lets the user decide what to save and whether it was completed or missed.
 
 The demo uses a fictional husband-and-wife scenario. The broader idea is suitable for couples, families, roommates, and caregivers.
 
@@ -19,13 +19,15 @@ The demo uses a fictional husband-and-wife scenario. The broader idea is suitabl
 - Start in the Interviewer Buddy-inspired cool-light dashboard, or switch to midnight mode with the theme icon; the choice is remembered on that device.
 - Copy a warm reward message; no automatic purchase or message is sent.
 - Optional hackathon demo integration: a consented private Telegram group automatically saves only clear, high-confidence tasks; medium-confidence messages receive a one-tap **Save promise** card.
+- A clear follow-up from The Wife can update an active Telegram task instead of creating a duplicate. For example, a later “buy carrots as well” message can be merged into an existing grocery task.
+- Tap a recent task to correct its wording or switch its outcome between **Do already** and **Miss**.
 
 ## Safety and privacy
 
 - Do not submit confidential or highly sensitive conversations.
 - The app displays a privacy note beside the input.
 - Original pasted message text is not retained after analysis.
-- High-confidence Telegram tasks are saved automatically; medium-confidence tasks require the user's approval. Vague or low-confidence messages are ignored.
+- High-confidence Telegram tasks are saved automatically; medium-confidence tasks require the user's approval. Clear additions to one active task are merged automatically; ambiguous follow-ups are ignored rather than creating a duplicate. Vague or low-confidence messages are ignored.
 - The playful meter is mutually agreed, optional product framing—not a judgement of relationship health.
 - The Telegram webhook accepts only the configured demo group and sender ID. It stores only the structured promise after one-tap approval, never the original message text.
 
@@ -38,7 +40,7 @@ This optional path is for the filmed demo. The normal pasted-message path remain
 3. Configure the five `TELEGRAM_*` values in the hosted environment. Use numeric Telegram IDs, not names.
 4. Set the bot webhook to `https://YOUR-DEPLOYED-URL/api/telegram/webhook` and supply the same `TELEGRAM_WEBHOOK_SECRET` as Telegram's secret token.
 
-The bot ignores all messages except text from the configured group and your wife's exact account ID. GPT automatically saves only clear, high-confidence commitments. Medium-confidence commitments receive a private **Save promise** or **Not a promise** card; low-confidence messages create no notification.
+The bot ignores all messages except text from the configured group and your wife's exact account ID. GPT automatically saves only clear, high-confidence commitments. When a clear message explicitly adds to one active task, GPT updates that task instead of saving another one. Medium-confidence commitments receive a private **Save promise** or **Not a promise** card; low-confidence or ambiguous update messages create no notification.
 
 ## Run locally
 
@@ -78,7 +80,7 @@ Codex accelerated the project by helping refine the product scope, set up the ap
 
 ## Demo link
 
-Add the live Codex Sites URL here after deployment.
+[Do already demo](https://promise-keeper-demo.leesianyi.chatgpt.site)
 
 ## Hackathon reminder
 

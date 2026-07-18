@@ -87,3 +87,9 @@ The source code and interaction flow are complete. The first local build verific
 
 - “Recent tasks” stands on its own without the redundant “The Story So Far” label.
 - The active and recent-task sections use a clearer theme-aware outline for better separation from the dashboard background.
+
+## 18 July 2026 — Active-task continuity and repair
+
+- GPT receives a compact list of active saved tasks when analysing a Telegram message. It may automatically merge a high-confidence, explicitly linked follow-up into exactly one active task; it must not guess when the target is unclear.
+- Recent tasks are now editable records: the user can correct the task wording and toggle an outcome between **Do already** and **Miss**. The saved dashboard record and Penalty Meter follow that correction.
+- The Penalty Meter keeps **Edit reward** at its top-right. Two matching minimalist happy-wife markers sit at opposite ends of the progress bar to make the intended win-win framing explicit: finishing helps today, and a miss funds her chosen reward.

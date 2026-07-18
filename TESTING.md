@@ -11,6 +11,8 @@
 7. Confirm the meter reaches the chosen value and the reward message can be copied.
 8. Select **Reset demo** and confirm the starting task state returns.
 9. Confirm the dashboard starts in cool-light mode. Tap the theme icon to switch to midnight, refresh, and confirm the chosen theme remains.
+10. Tap a card in **Recent tasks**, correct its task wording, switch it between **Do already** and **Miss**, and save. Confirm the card and Penalty Meter update.
+11. Confirm **Edit reward** sits at the Penalty Meter’s top-right and that matching happy-wife markers sit above both ends of the progress bar.
 
 ## Safety checks
 
@@ -31,3 +33,5 @@ With `OPENAI_API_KEY` configured, paste a new harmless fictional message. Confir
 4. Send an ambiguous but plausible task. Confirm the user receives a private Telegram card with **Save promise** and **Not a promise**; tap **Save promise** and confirm it appears on the dashboard.
 5. Send a vague conversational message and confirm no card or promise is created.
 6. Send a message from another account or group and confirm no card or promise is created.
+7. Send a clear task, then a clearly linked addition such as “oh I forgot, buy carrots as well.” Confirm the original active task is updated with the combined items instead of creating a second task.
+8. Send a vague follow-up that could refer to more than one task. Confirm no task is changed or created.

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Status = "due" | "completed" | "missed" | "needs-date";
 type PromiseItem = {
@@ -76,8 +76,12 @@ export default function Home() {
   const [theme, setTheme] = useState<Theme>("light");
   const [hasLoadedLocalSettings, setHasLoadedLocalSettings] = useState(false);
   const [isEditingReward, setIsEditingReward] = useState(false);
+  const [editingTask, setEditingTask] = useState<PromiseItem | null>(null);
+  const [taskTitleDraft, setTaskTitleDraft] = useState("");
+  const [taskStatusDraft, setTaskStatusDraft] = useState<"completed" | "missed">("completed");
   const [notice, setNotice] = useState<Notice | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const taskEditorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedReward = getStoredReward();
@@ -131,6 +135,37 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  useEffect(() => {
+    if (!editingTask) return;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusFirstField = window.setTimeout(() => taskEditorRef.current?.querySelector<HTMLInputElement>("input")?.focus(), 0);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setEditingTask(null);
+        return;
+      }
+      if (event.key !== "Tab" || !taskEditorRef.current) return;
+      const focusable = Array.from(taskEditorRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.clearTimeout(focusFirstField);
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [editingTask]);
+
   const missedTotal = useMemo(
     () => promises.filter((item) => item.status === "missed").length * 100,
     [promises],
@@ -140,11 +175,11 @@ export default function Home() {
   const meterProgress = Math.min((missedTotal / reward.value) * 100, 100);
   const waitingLabel = activePromises.length === 1 ? "1 task waiting" : `${activePromises.length} tasks waiting`;
 
-  function persistStatus(id: string, status: Status) {
+  function persistTask(id: string, updates: Partial<Pick<PromiseItem, "status" | "title">>) {
     void fetch(`/api/promises/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify(updates),
     }).catch(() => setNotice({ message: "Saved on this device. We’ll try Telegram again shortly.", tone: "warning" }));
   }
 
@@ -152,7 +187,7 @@ export default function Home() {
     const previous = promises.find((item) => item.id === id)?.status;
     if (!previous) return;
     setPromises((current) => current.map((item) => (item.id === id ? { ...item, status } : item)));
-    persistStatus(id, status);
+    persistTask(id, { status });
     if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(10);
     setNotice({
       message: status === "completed" ? "Done already. Nice one." : "Aiya. $100 added to the meter.",
@@ -164,8 +199,38 @@ export default function Home() {
   function undoLastUpdate() {
     if (!notice?.undo) return;
     setPromises((current) => current.map((item) => (item.id === notice.undo?.id ? { ...item, status: notice.undo.status } : item)));
-    persistStatus(notice.undo.id, notice.undo.status);
+    persistTask(notice.undo.id, { status: notice.undo.status });
     setNotice({ message: "Back on your list.", tone: "neutral" });
+  }
+
+  function startTaskEdit(item: PromiseItem) {
+    if (item.status !== "completed" && item.status !== "missed") return;
+    setEditingTask(item);
+    setTaskTitleDraft(item.title);
+    setTaskStatusDraft(item.status);
+  }
+
+  function cancelTaskEdit() {
+    setEditingTask(null);
+  }
+
+  function saveTaskEdit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!editingTask) return;
+    const title = taskTitleDraft.trim();
+    if (!title) {
+      setNotice({ message: "Give this task a clear name first.", tone: "warning" });
+      return;
+    }
+    setPromises((current) => current.map((item) => (
+      item.id === editingTask.id ? { ...item, title, status: taskStatusDraft } : item
+    )));
+    persistTask(editingTask.id, { title, status: taskStatusDraft });
+    setEditingTask(null);
+    setNotice({
+      message: taskStatusDraft === "completed" ? "Task updated — done already." : "Task updated — $100 is on the meter.",
+      tone: taskStatusDraft === "completed" ? "success" : "warning",
+    });
   }
 
   function startRewardEdit() {
@@ -252,8 +317,11 @@ export default function Home() {
             <p className="meter-value">{formatCurrency(missedTotal)}</p>
             <p className="meter-caption">of {formatCurrency(reward.value)} toward The Wife’s {reward.title}</p>
           </div>
-          <button className="reward-edit-button" onClick={startRewardEdit} aria-expanded={isEditingReward} aria-controls="reward-settings">Edit reward</button>
-          <div className="meter-track" aria-hidden="true"><span style={{ width: `${meterProgress}%` }} /></div>
+          <button className="reward-edit-button" type="button" onClick={startRewardEdit} aria-expanded={isEditingReward} aria-controls="reward-settings">Edit reward</button>
+          <div className="meter-journey" role="img" aria-label="The Wife wins whether the task is completed or the reward is unlocked">
+            <div className="meter-faces" aria-hidden="true"><span className="wife-face"><span className="wife-face-detail" /></span><span className="wife-face"><span className="wife-face-detail" /></span></div>
+            <div className="meter-track" aria-hidden="true"><span style={{ width: `${meterProgress}%` }} /></div>
+          </div>
           <p className="playful-note">Every miss brings the reward closer.</p>
         </section>
 
@@ -276,9 +344,31 @@ export default function Home() {
 
         <section className="history-section" aria-labelledby="history-heading">
           <div className="section-heading"><div><h2 id="history-heading">Recent tasks</h2></div></div>
-          {promises.filter((item) => item.status === "completed" || item.status === "missed").map((item) => <HistoryCard key={item.id} item={item} />)}
+          {promises.filter((item) => item.status === "completed" || item.status === "missed").map((item) => <HistoryCard key={item.id} item={item} onEdit={startTaskEdit} />)}
         </section>
       </section>
+
+      {editingTask && (
+        <div className="task-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) cancelTaskEdit(); }}>
+          <div className="task-editor" ref={taskEditorRef} role="dialog" aria-modal="true" aria-labelledby="task-editor-title" aria-describedby="task-editor-description">
+            <form onSubmit={saveTaskEdit}>
+              <div className="task-editor-heading">
+                <div><p className="eyebrow">EDIT RECENT TASK</p><h2 id="task-editor-title">Set the record straight</h2><p id="task-editor-description">Tidy the task wording or change how it ended.</p></div>
+                <button type="button" className="editor-close" onClick={cancelTaskEdit} aria-label="Close task editor">×</button>
+              </div>
+              <label className="task-editor-label">Task<input value={taskTitleDraft} onChange={(event) => setTaskTitleDraft(event.target.value)} /></label>
+              <fieldset className="task-status-picker">
+                <legend>How did it go?</legend>
+                <div>
+                  <button type="button" className={`task-status-choice complete ${taskStatusDraft === "completed" ? "selected" : ""}`} aria-pressed={taskStatusDraft === "completed"} onClick={() => setTaskStatusDraft("completed")}><span>Do already</span><small>Completed</small></button>
+                  <button type="button" className={`task-status-choice missed ${taskStatusDraft === "missed" ? "selected" : ""}`} aria-pressed={taskStatusDraft === "missed"} onClick={() => setTaskStatusDraft("missed")}><span>Miss</span><small>Forgot it</small></button>
+                </div>
+              </fieldset>
+              <div className="task-editor-actions"><button type="button" className="editor-cancel" onClick={cancelTaskEdit}>Cancel</button><button className="editor-save" type="submit">Save task</button></div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {notice && <aside className={`notice ${notice.tone}`} role="status"><p>{notice.message}</p>{notice.undo && <button onClick={undoLastUpdate}>Undo</button>}</aside>}
     </main>
@@ -301,7 +391,7 @@ function PromiseCard({ item, onStatus }: { item: PromiseItem; onStatus: (id: str
   );
 }
 
-function HistoryCard({ item }: { item: PromiseItem }) {
+function HistoryCard({ item, onEdit }: { item: PromiseItem; onEdit: (item: PromiseItem) => void }) {
   const missed = item.status === "missed";
-  return <article className="history-card"><span className={`history-status ${missed ? "missed" : "complete"}`}>{missed ? "AIYA" : "DONE"}</span><div><h3>{item.title}</h3><p>{item.dueText}</p></div><strong>{missed ? "+$100" : "Done already"}</strong></article>;
+  return <article className="history-card"><button type="button" className="history-edit-button" onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`}><span className={`history-status ${missed ? "missed" : "complete"}`}>{missed ? "MISS" : "DONE"}</span><span className="history-copy"><h3>{item.title}</h3><p>{item.dueText}</p></span><strong>{missed ? "+$100" : "Done already"}</strong><span className="history-chevron" aria-hidden="true">›</span></button></article>;
 }
