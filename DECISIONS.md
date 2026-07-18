@@ -66,3 +66,8 @@ The source code and interaction flow are complete. The first local build verific
 
 - The dashboard adopts the Interviewer Buddy’s midnight, blue, teal, amber, and coral visual language while retaining Do Already?’s playful copy.
 - The fixed spa voucher is now only the default. The reward name and its SGD value are editable in the dashboard and stored on that device, which keeps the no-login MVP simple.
+
+## 18 July 2026 — Adaptive Interviewer Buddy theme
+
+- Do Already? keeps the midnight dashboard as its default, while adding the Interviewer Buddy’s cool-light theme as a user-controlled alternative.
+- The theme switch is remembered on the current device. It changes only presentation, never Telegram tasks, promises, or reward data.

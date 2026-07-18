@@ -15,6 +15,7 @@ type PromiseItem = {
 };
 type Reward = { title: string; value: number };
 type RewardDraft = { title: string; value: string };
+type Theme = "dark" | "light";
 type Notice = {
   message: string;
   tone: "success" | "warning" | "neutral";
@@ -54,6 +55,12 @@ function getStoredReward(): Reward {
   }
 }
 
+function getStoredTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  const saved = window.localStorage.getItem("do-already-theme");
+  return saved === "light" || saved === "dark" ? saved : "dark";
+}
+
 function formatCurrency(value: number) {
   return `$${value.toLocaleString("en-SG")}`;
 }
@@ -66,6 +73,7 @@ export default function Home() {
   const [promises, setPromises] = useState<PromiseItem[]>(starterPromises);
   const [reward, setReward] = useState<Reward>(DEFAULT_REWARD);
   const [rewardDraft, setRewardDraft] = useState<RewardDraft>({ title: DEFAULT_REWARD.title, value: String(DEFAULT_REWARD.value) });
+  const [theme, setTheme] = useState<Theme>("dark");
   const [hasLoadedLocalSettings, setHasLoadedLocalSettings] = useState(false);
   const [isEditingReward, setIsEditingReward] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -76,8 +84,18 @@ export default function Home() {
     setPromises(getStoredPromises());
     setReward(storedReward);
     setRewardDraft({ title: storedReward.title, value: String(storedReward.value) });
+    setTheme(getStoredTheme());
     setHasLoadedLocalSettings(true);
   }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    if (!hasLoadedLocalSettings) return;
+    window.localStorage.setItem("do-already-theme", theme);
+  }, [hasLoadedLocalSettings, theme]);
 
   useEffect(() => {
     if (!hasLoadedLocalSettings) return;
@@ -206,7 +224,18 @@ export default function Home() {
             <h1>{waitingLabel}</h1>
             <p className="header-subtitle">Live from your chat with The Wife</p>
           </div>
-          <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
+          <div className="topbar-actions">
+            <button
+              className="theme-toggle"
+              type="button"
+              onClick={() => setTheme((current) => (current === "dark" ? "light" : "dark"))}
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
+            <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
+          </div>
         </header>
 
         <section className="promises-section" aria-labelledby="promises-heading">
