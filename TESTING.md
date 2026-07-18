@@ -6,9 +6,10 @@
 2. Confirm the dashboard begins at $200 with two missed promises and one completed promise.
 3. Select **Jason needs his swimming gear tomorrow** and choose **Find the promise**.
 4. Confirm the editable AI draft appears; save it.
-5. Mark the saved promise **Missed +$100**.
-6. Confirm the meter reaches $300 and the spa-voucher message can be copied.
-7. Select **Reset demo data** and confirm the starting state returns.
+5. Mark the saved promise **Aiya I forgot**.
+6. Choose **Edit reward**, set a different reward and SGD value, then save it. Confirm the Penalty Meter and reward note update immediately.
+7. Confirm the meter reaches the chosen value and the reward message can be copied.
+8. Select **Reset demo** and confirm the starting task state returns.
 
 ## Safety checks
 

@@ -15,7 +15,7 @@ The demo uses a fictional husband-and-wife scenario. The broader idea is suitabl
 - Edit every field before saving.
 - Store confirmed promise details locally in the browser.
 - Mark promises completed or missed.
-- Add $100 per missed promise and unlock a pre-agreed $300 spa voucher at three misses.
+- Add $100 per missed promise and work toward a reward chosen in the dashboard; both the reward and its SGD value are editable on that device.
 - Copy a warm reward message; no automatic purchase or message is sent.
 - Optional hackathon demo integration: a consented private Telegram group automatically saves only clear, high-confidence tasks; medium-confidence messages receive a one-tap **Save promise** card.
 

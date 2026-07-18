@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Status = "due" | "completed" | "missed" | "needs-date";
 type PromiseItem = {
@@ -13,12 +13,15 @@ type PromiseItem = {
   confidence: "High" | "Medium" | "Low";
   status: Status;
 };
+type Reward = { title: string; value: number };
+type RewardDraft = { title: string; value: string };
 type Notice = {
   message: string;
   tone: "success" | "warning" | "neutral";
   undo?: { id: string; status: Status };
 };
 
+const DEFAULT_REWARD: Reward = { title: "Spa day", value: 300 };
 const starterPromises: PromiseItem[] = [
   { id: "dog-food", title: "Buy dog food before coming home", category: "Errand", dueText: "Missed · Tue, 14 Jul", relevantPerson: "The Wife", preparation: "Pick up the usual brand on the way home.", confidence: "High", status: "missed" },
   { id: "dinner", title: "Book anniversary dinner", category: "Important date", dueText: "Missed · Wed, 15 Jul", relevantPerson: "The Wife", preparation: "Choose a restaurant and reserve a table.", confidence: "High", status: "missed" },
@@ -36,15 +39,56 @@ function getStoredPromises() {
   }
 }
 
+function getStoredReward(): Reward {
+  if (typeof window === "undefined") return DEFAULT_REWARD;
+  const saved = window.localStorage.getItem("do-already-reward");
+  if (!saved) return DEFAULT_REWARD;
+  try {
+    const parsed = JSON.parse(saved) as Partial<Reward>;
+    if (typeof parsed.title !== "string" || !parsed.title.trim() || !Number.isFinite(parsed.value) || parsed.value! < 1) {
+      return DEFAULT_REWARD;
+    }
+    return { title: parsed.title.trim(), value: Math.round(parsed.value) };
+  } catch {
+    return DEFAULT_REWARD;
+  }
+}
+
+function formatCurrency(value: number) {
+  return `$${value.toLocaleString("en-SG")}`;
+}
+
+function rewardMark(title: string) {
+  return title.trim().split(/\s+/)[0]?.slice(0, 4).toUpperCase() || "GIFT";
+}
+
 export default function Home() {
   const [promises, setPromises] = useState<PromiseItem[]>(starterPromises);
+  const [reward, setReward] = useState<Reward>(DEFAULT_REWARD);
+  const [rewardDraft, setRewardDraft] = useState<RewardDraft>({ title: DEFAULT_REWARD.title, value: String(DEFAULT_REWARD.value) });
+  const [hasLoadedLocalSettings, setHasLoadedLocalSettings] = useState(false);
+  const [isEditingReward, setIsEditingReward] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [isResetting, setIsResetting] = useState(false);
 
-  useEffect(() => setPromises(getStoredPromises()), []);
   useEffect(() => {
+    const storedReward = getStoredReward();
+    setPromises(getStoredPromises());
+    setReward(storedReward);
+    setRewardDraft({ title: storedReward.title, value: String(storedReward.value) });
+    setHasLoadedLocalSettings(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasLoadedLocalSettings) return;
     window.localStorage.setItem("do-already-promises", JSON.stringify(promises));
-  }, [promises]);
+  }, [hasLoadedLocalSettings, promises]);
+
+  useEffect(() => {
+    if (!hasLoadedLocalSettings) return;
+    window.localStorage.setItem("do-already-reward", JSON.stringify(reward));
+  }, [hasLoadedLocalSettings, reward]);
+
   useEffect(() => {
     const loadTelegramPromises = async () => {
       try {
@@ -62,6 +106,7 @@ export default function Home() {
     const timer = window.setInterval(loadTelegramPromises, 5000);
     return () => window.clearInterval(timer);
   }, []);
+
   useEffect(() => {
     if (!notice) return;
     const timer = window.setTimeout(() => setNotice(null), 5000);
@@ -72,10 +117,10 @@ export default function Home() {
     () => promises.filter((item) => item.status === "missed").length * 100,
     [promises],
   );
-  const rewardUnlocked = missedTotal >= 300;
+  const rewardUnlocked = missedTotal >= reward.value;
   const activePromises = promises.filter((item) => item.status === "due" || item.status === "needs-date");
-  const meterProgress = Math.min((missedTotal / 300) * 100, 100);
-  const waitingLabel = activePromises.length === 1 ? "1 promise waiting" : `${activePromises.length} promises waiting`;
+  const meterProgress = Math.min((missedTotal / reward.value) * 100, 100);
+  const waitingLabel = activePromises.length === 1 ? "1 task waiting" : `${activePromises.length} tasks waiting`;
 
   function persistStatus(id: string, status: Status) {
     void fetch(`/api/promises/${id}`, {
@@ -105,6 +150,30 @@ export default function Home() {
     setNotice({ message: "Back on your list.", tone: "neutral" });
   }
 
+  function startRewardEdit() {
+    setRewardDraft({ title: reward.title, value: String(reward.value) });
+    setIsEditingReward(true);
+  }
+
+  function cancelRewardEdit() {
+    setRewardDraft({ title: reward.title, value: String(reward.value) });
+    setIsEditingReward(false);
+  }
+
+  function saveReward(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const title = rewardDraft.title.trim();
+    const value = Math.round(Number(rewardDraft.value));
+    if (!title || !Number.isFinite(value) || value < 1) {
+      setNotice({ message: "Add a reward name and a value above $0.", tone: "warning" });
+      return;
+    }
+    setReward({ title, value });
+    setRewardDraft({ title, value: String(value) });
+    setIsEditingReward(false);
+    setNotice({ message: `${title} is now the reward at ${formatCurrency(value)}.`, tone: "success" });
+  }
+
   async function resetDemo() {
     setIsResetting(true);
     try {
@@ -121,10 +190,10 @@ export default function Home() {
 
   async function copyReward() {
     try {
-      await navigator.clipboard.writeText("I’ve reached our playful promise-meter limit. I owe you the $300 spa voucher we agreed on. Pick a spa you’d love and I’ll make it happen ❤️");
-      setNotice({ message: "Voucher note copied.", tone: "success" });
+      await navigator.clipboard.writeText(`I’ve reached our playful penalty-meter limit. I owe you the ${formatCurrency(reward.value)} ${reward.title} we agreed on. Pick what you’d love and I’ll make it happen.`);
+      setNotice({ message: "Reward note copied.", tone: "success" });
     } catch {
-      setNotice({ message: "Couldn’t copy the voucher note. Please try again.", tone: "warning" });
+      setNotice({ message: "Couldn’t copy the reward note. Please try again.", tone: "warning" });
     }
   }
 
@@ -133,59 +202,57 @@ export default function Home() {
       <section className="phone-frame" aria-label="Do Already dashboard">
         <header className="topbar">
           <div>
-            <p className="wordmark">DO ALREADY?</p>
+            <p className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></p>
             <h1>{waitingLabel}</h1>
-            <p className="header-subtitle">Live from your Telegram approvals</p>
+            <p className="header-subtitle">Live from your chat with The Wife</p>
           </div>
           <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
         </header>
 
         <section className="promises-section" aria-labelledby="promises-heading">
           <div className="section-heading">
-            <div>
-              <p className="eyebrow">KEEP YOUR WORD</p>
-              <h2 id="promises-heading">{activePromises.length ? "Your next moves" : "You’re all caught up"}</h2>
-            </div>
-            <span className="count-pill" aria-label={`${activePromises.length} active promises`}>{activePromises.length}</span>
+            <div><h2 id="promises-heading">{activePromises.length ? "Don’t forget ah" : "You’re all caught up"}</h2></div>
+            <span className="count-pill" aria-label={`${activePromises.length} active tasks`}>{activePromises.length}</span>
           </div>
-          {activePromises.length ? activePromises.map((item) => <PromiseCard key={item.id} item={item} onStatus={updateStatus} />) : <p className="empty-state">You’re all clear for now. New promises arrive from Telegram.</p>}
+          {activePromises.length ? activePromises.map((item) => <PromiseCard key={item.id} item={item} onStatus={updateStatus} />) : <p className="empty-state">You’re all clear for now. New tasks arrive from Telegram.</p>}
         </section>
 
-        <section className="hero-card" aria-label={`Promise meter: ${missedTotal} of 300 dollars`}>
+        <section className="hero-card" aria-label={`Penalty meter: ${formatCurrency(missedTotal)} of ${formatCurrency(reward.value)}`}>
           <div className="hero-copy">
-            <p className="eyebrow inverse-eyebrow">YOUR PROMISE METER</p>
-            <p className="meter-value">${missedTotal}</p>
-            <p className="meter-caption">of $300 toward The Wife’s spa day</p>
+            <p className="eyebrow inverse-eyebrow">PENALTY METER</p>
+            <p className="meter-value">{formatCurrency(missedTotal)}</p>
+            <p className="meter-caption">of {formatCurrency(reward.value)} toward The Wife’s {reward.title}</p>
           </div>
-          <div className="reward-stamp" aria-hidden="true"><span>SPA</span></div>
+          <div className="reward-stamp" aria-hidden="true"><span>{rewardMark(reward.title)}</span></div>
+          <button className="reward-edit-button" onClick={startRewardEdit} aria-expanded={isEditingReward} aria-controls="reward-settings">Edit reward</button>
           <div className="meter-track" aria-hidden="true"><span style={{ width: `${meterProgress}%` }} /></div>
-          <p className="playful-note">Every miss moves the spa day closer.</p>
+          <p className="playful-note">Every miss brings the reward closer.</p>
         </section>
+
+        {isEditingReward && (
+          <form className="reward-editor" id="reward-settings" onSubmit={saveReward}>
+            <div className="reward-editor-heading"><div><p className="eyebrow">SET THE REWARD</p><h2>What does The Wife want?</h2></div><button type="button" className="editor-close" onClick={cancelRewardEdit} aria-label="Close reward editor">×</button></div>
+            <label>Reward<input value={rewardDraft.title} onChange={(event) => setRewardDraft((draft) => ({ ...draft, title: event.target.value }))} placeholder="Spa day, staycation…" /></label>
+            <label>Value (SGD)<input type="number" min="1" step="10" inputMode="numeric" value={rewardDraft.value} onChange={(event) => setRewardDraft((draft) => ({ ...draft, value: event.target.value }))} /></label>
+            <div className="reward-editor-actions"><button type="button" className="editor-cancel" onClick={cancelRewardEdit}>Cancel</button><button className="editor-save" type="submit">Save reward</button></div>
+          </form>
+        )}
 
         {rewardUnlocked && (
-          <section className="reward-card" aria-label="Spa voucher unlocked">
-            <div className="reward-stamp small" aria-hidden="true"><span>SPA</span></div>
-            <div>
-              <p className="eyebrow">REWARD UNLOCKED</p>
-              <h2>Spa day unlocked</h2>
-              <p>The $300 voucher is ready for The Wife.</p>
-            </div>
-            <button className="copy-button" onClick={copyReward}>Copy voucher note</button>
+          <section className="reward-card" aria-label={`${reward.title} unlocked`}>
+            <div className="reward-stamp small" aria-hidden="true"><span>{rewardMark(reward.title)}</span></div>
+            <div><p className="eyebrow">REWARD UNLOCKED</p><h2>{reward.title} unlocked</h2><p>The {formatCurrency(reward.value)} reward is ready for The Wife.</p></div>
+            <button className="copy-button" onClick={copyReward}>Copy reward note</button>
           </section>
         )}
 
         <section className="history-section" aria-labelledby="history-heading">
-          <div className="section-heading"><div><p className="eyebrow">THE STORY SO FAR</p><h2 id="history-heading">Recent promises</h2></div></div>
+          <div className="section-heading"><div><p className="eyebrow">THE STORY SO FAR</p><h2 id="history-heading">Recent tasks</h2></div></div>
           {promises.filter((item) => item.status === "completed" || item.status === "missed").map((item) => <HistoryCard key={item.id} item={item} />)}
         </section>
       </section>
 
-      {notice && (
-        <aside className={`notice ${notice.tone}`} role="status">
-          <p>{notice.message}</p>
-          {notice.undo && <button onClick={undoLastUpdate}>Undo</button>}
-        </aside>
-      )}
+      {notice && <aside className={`notice ${notice.tone}`} role="status"><p>{notice.message}</p>{notice.undo && <button onClick={undoLastUpdate}>Undo</button>}</aside>}
     </main>
   );
 }
@@ -200,10 +267,7 @@ function PromiseCard({ item, onStatus }: { item: PromiseItem; onStatus: (id: str
         <div className="promise-title-row"><h3>{item.title}</h3><span>{item.category}</span></div>
         <p className="promise-meta"><span>{item.dueText}</span><span>For {relevantPerson}</span></p>
         {hasPreparation && <p className="prep">{item.preparation}</p>}
-        <div className="status-actions">
-          <button className="complete-action" onClick={() => onStatus(item.id, "completed")} aria-label={`Mark ${item.title} as done`}>Do already</button>
-          <button className="missed-action" onClick={() => onStatus(item.id, "missed")} aria-label={`Mark ${item.title} as forgotten`}>Aiya I forgot</button>
-        </div>
+        <div className="status-actions"><button className="complete-action" onClick={() => onStatus(item.id, "completed")} aria-label={`Mark ${item.title} as done`}>Do already</button><button className="missed-action" onClick={() => onStatus(item.id, "missed")} aria-label={`Mark ${item.title} as forgotten`}>Aiya I forgot</button></div>
       </div>
     </article>
   );

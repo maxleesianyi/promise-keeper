@@ -61,3 +61,8 @@ The source code and interaction flow are complete. The first local build verific
 ## 18 July 2026 â€” Cost-conscious model choice
 
 - The Telegram commitment classifier uses GPT-5.6 Luna, the cost-sensitive tier of the GPT-5.6 family, while preserving the same structured extraction and confidence-routing behaviour.
+
+## 18 July 2026 â€” Reward ownership and dashboard tone
+
+- The dashboard adopts the Interviewer Buddy’s midnight, blue, teal, amber, and coral visual language while retaining Do Already?’s playful copy.
+- The fixed spa voucher is now only the default. The reward name and its SGD value are editable in the dashboard and stored on that device, which keeps the no-login MVP simple.
