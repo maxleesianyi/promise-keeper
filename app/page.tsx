@@ -10,7 +10,7 @@ type PromiseItem = {
   dueText: string;
   relevantPerson: string;
   preparation: string;
-  confidence: "High" | "Medium" | "Needs your input";
+  confidence: "High" | "Medium" | "Low";
   status: Status;
 };
 type Notice = {

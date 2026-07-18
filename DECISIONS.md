@@ -51,3 +51,9 @@ The source code and interaction flow are complete. The first local build verific
 - The webhook accepts only the configured group and the wife's exact Telegram account ID. It ignores all other messages.
 - GPT sends a private one-tap **Save promise** or **Not a promise** card only for high-confidence commitments. No promise is saved without the user's approval.
 - Confirmed Telegram promises are stored in D1 so they appear in the web dashboard. Original Telegram message text is never stored.
+
+## 18 July 2026 â€” Confidence-based Telegram routing
+
+- Clear, high-confidence tasks from the allowlisted sender are saved to Do Already? automatically, without a private approval card.
+- Medium-confidence tasks require the user's existing private **Save promise** or **Not a promise** decision.
+- Low-confidence and ordinary chat messages are ignored, avoiding unnecessary notifications and accidental promises.

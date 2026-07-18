@@ -25,6 +25,7 @@ With `OPENAI_API_KEY` configured, paste a new harmless fictional message. Confir
 
 1. Configure all `TELEGRAM_*` values and deploy the app.
 2. Send a clear fictional commitment from the allowlisted wife account in the private demo group.
-3. Confirm the user receives a private Telegram card with **Save promise** and **Not a promise**.
-4. Tap **Save promise**, refresh the dashboard, and confirm the promise appears.
-5. Send a message from another account or group and confirm no card is sent.
+3. Confirm it appears on the dashboard automatically, without a private approval card.
+4. Send an ambiguous but plausible task. Confirm the user receives a private Telegram card with **Save promise** and **Not a promise**; tap **Save promise** and confirm it appears on the dashboard.
+5. Send a vague conversational message and confirm no card or promise is created.
+6. Send a message from another account or group and confirm no card or promise is created.

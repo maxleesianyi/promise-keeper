@@ -8,3 +8,7 @@
 - Added browser-only promise storage, complete/missed states, $100 promise meter, and $300 spa-voucher reward unlock.
 - Added Build Week documentation and setup instructions.
 - Added the consented Telegram demo path: strict group/sender allowlisting, high-confidence GPT extraction, one-tap approval, and durable approved-promise storage.
+
+## 18 July 2026
+
+- Added confidence-based Telegram routing: clear high-confidence tasks are saved automatically, medium-confidence tasks receive a private approval card, and low-confidence messages are ignored.
