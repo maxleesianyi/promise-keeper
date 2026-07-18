@@ -1,6 +1,6 @@
 # Do Already?
 
-**Do Already?** is a playful, mobile-first accountability assistant for everyday household commitments. It turns a clear Telegram instruction from **The Wife** into a task for the user, helps the user record whether it was done or missed, and makes the agreed reward visible without shaming either person.
+**Do Already?** is a playful, mobile-first accountability assistant for everyday household commitments. It turns a clear Telegram instruction into a task for the user, helps the user record whether it was done or missed, and makes the agreed reward visible without shaming either person.
 
 Built for **OpenAI Build Week** with Codex and GPT-5.6.
 
