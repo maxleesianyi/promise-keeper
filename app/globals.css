@@ -39,6 +39,7 @@
   --notice-button-hover: rgba(11, 13, 15, 0.24);
   --notice-ink: #101419;
   --frame-surface: rgba(21, 26, 32, 0.8);
+  --section-outline: rgba(244, 239, 231, 0.16);
   --hero-shadow: 0 20px 44px rgba(0, 0, 0, 0.3);
   --frame-shadow: 0 28px 70px rgba(0, 0, 0, 0.36);
   --shadow-card: 0 0 0 1px var(--line-inset), 0 18px 38px rgba(0, 0, 0, 0.18);
@@ -84,6 +85,7 @@
   --notice-button-hover: rgba(255, 255, 255, 0.3);
   --notice-ink: #ffffff;
   --frame-surface: rgba(255, 255, 255, 0.84);
+  --section-outline: rgba(64, 86, 214, 0.24);
   --hero-shadow: 0 14px 32px rgba(16, 19, 35, 0.12);
   --frame-shadow: 0 28px 70px rgba(16, 19, 35, 0.14);
   --shadow-card: 0 1px 0 rgba(16, 19, 35, 0.05), 0 10px 24px rgba(16, 19, 35, 0.06);
@@ -120,7 +122,7 @@ h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
 .reset-button:active, .theme-toggle:active, .status-actions button:active, .copy-button:active, .notice button:active, .reward-edit-button:active, .reward-editor-actions button:active, .editor-close:active { transform: scale(0.96); }
 
 .promises-section, .history-section, .hero-card, .reward-card, .reward-editor { border-radius: 24px; }
-.promises-section, .history-section { margin-top: 16px; padding: 20px; background: var(--surface); box-shadow: var(--shadow-card); }
+.promises-section, .history-section { margin-top: 16px; padding: 20px; background: var(--surface); box-shadow: 0 0 0 1px var(--section-outline), var(--shadow-card); }
 .section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .count-pill { display: grid; min-width: 36px; height: 36px; padding: 0 10px; place-items: center; border-radius: 10px; background: var(--accent-soft); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-outline-soft); font-size: 0.76rem; font-weight: 800; font-variant-numeric: tabular-nums; }
 
@@ -180,7 +182,6 @@ h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
 .copy-button:hover { background: var(--amber-strong); }
 
 .history-section { background: var(--surface); }
-.history-section .eyebrow { margin-bottom: 7px; color: var(--muted); }
 .history-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 11px; padding: 14px 0; border-bottom: 1px solid var(--line); }
 .history-card:last-child { border-bottom: 0; padding-bottom: 0; }
 .history-status { display: grid; min-width: 42px; height: 28px; padding: 0 7px; place-items: center; border-radius: 7px; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; }

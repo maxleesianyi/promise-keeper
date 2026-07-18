@@ -275,7 +275,7 @@ export default function Home() {
         )}
 
         <section className="history-section" aria-labelledby="history-heading">
-          <div className="section-heading"><div><p className="eyebrow">THE STORY SO FAR</p><h2 id="history-heading">Recent tasks</h2></div></div>
+          <div className="section-heading"><div><h2 id="history-heading">Recent tasks</h2></div></div>
           {promises.filter((item) => item.status === "completed" || item.status === "missed").map((item) => <HistoryCard key={item.id} item={item} />)}
         </section>
       </section>

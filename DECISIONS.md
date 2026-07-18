@@ -82,3 +82,8 @@ The source code and interaction flow are complete. The first local build verific
 
 - The compact theme and reset controls sit above the product heading. The product name is reduced to a single unbroken mobile line, followed by the supporting task count.
 - The theme control now uses a simple half-light, half-dark appearance glyph instead of the earlier custom sun-and-moon treatment.
+
+## 18 July 2026 — Task section refinement
+
+- “Recent tasks” stands on its own without the redundant “The Story So Far” label.
+- The active and recent-task sections use a clearer theme-aware outline for better separation from the dashboard background.
