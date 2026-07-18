@@ -6,7 +6,7 @@
 2. Confirm the starter dashboard has two **MISS** cards, one **DONE** card, and a $200 Penalty Meter.
 3. Tap **Edit reward**, change the reward name or value in $10 SGD steps, and save. Confirm the meter copy updates.
 4. Tap a card in **Recent tasks**. Change the wording, switch it between **Do already** and **Miss**, and save. Confirm the card and Penalty Meter update.
-5. Confirm the matching character badges sit above both ends of the Penalty Meter progress bar.
+5. Confirm exactly one character follows the Penalty Meter progress: she is delighted at 0% and 100%, annoyed on either side of the middle, and most unhappy around 50%.
 6. Tap the theme icon, refresh, and confirm the theme choice is remembered on that device.
 7. Tap **Reset demo** and confirm the dashboard returns to its starter task state.
 

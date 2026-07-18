@@ -169,17 +169,38 @@ h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
 .reward-edit-button { position: absolute; top: 20px; right: 20px; min-height: 40px; padding: 0 11px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--accent-outline); font-size: 0.73rem; font-weight: 800; transition-duration: 180ms; transition-property: background-color, color, transform; transition-timing-function: var(--ease); }
 .reward-edit-button:hover { background: var(--accent-hover); }
 .meter-journey { margin-top: 18px; }
-.meter-faces { display: flex; align-items: end; justify-content: space-between; height: 50px; padding: 0 2px 2px; }
-.wife-avatar { position: relative; display: block; width: 42px; height: 42px; border-radius: 15px 15px 17px 17px; background: var(--wife-halo); box-shadow: inset 0 0 0 1px rgba(16, 19, 35, 0.08), 0 5px 12px rgba(16, 19, 35, 0.12); }
+.meter-character-rail { position: relative; height: 50px; padding-bottom: 2px; }
+.wife-avatar { position: absolute; bottom: 2px; display: block; width: 42px; height: 42px; border-radius: 15px 15px 17px 17px; background: var(--wife-halo); box-shadow: inset 0 0 0 1px rgba(16, 19, 35, 0.08), 0 5px 12px rgba(16, 19, 35, 0.12); transform: translateX(-50%); transition: left 320ms var(--ease), transform 240ms var(--ease), filter 240ms var(--ease); }
 .wife-avatar-hair { position: absolute; z-index: 1; top: 4px; left: 6px; width: 30px; height: 32px; border-radius: 17px 17px 13px 13px; background: var(--wife-hair); }
 .wife-avatar-hair::before { position: absolute; top: -4px; left: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--wife-hair); box-shadow: 14px 0 0 var(--wife-hair); content: ""; }
 .wife-avatar-hair::after { position: absolute; top: 8px; left: 2px; width: 26px; height: 10px; border-radius: 50% 50% 30% 30%; background: var(--wife-hair); content: ""; }
 .wife-avatar-face { position: absolute; z-index: 2; top: 10px; left: 9px; width: 24px; height: 27px; border-radius: 46% 46% 42% 42%; background: linear-gradient(135deg, var(--wife-skin), var(--wife-skin-shadow)); box-shadow: inset 0 -2px 0 rgba(105, 55, 42, 0.09); }
-.wife-avatar-face::before { position: absolute; top: 8px; left: 6px; width: 3px; height: 4px; border-radius: 50%; background: var(--wife-ink); box-shadow: 9px 0 0 var(--wife-ink); content: ""; }
-.wife-avatar-face::after { position: absolute; top: 16px; left: 7px; width: 10px; height: 5px; border: 2px solid var(--wife-ink); border-top: 0; border-radius: 0 0 9px 9px; content: ""; }
-.wife-avatar-blush { position: absolute; top: 14px; left: 2px; width: 4px; height: 3px; border-radius: 50%; background: var(--wife-cheek); box-shadow: 16px 0 0 var(--wife-cheek); opacity: 0.78; }
+.wife-avatar-brows, .wife-avatar-eyes, .wife-avatar-mouth, .wife-avatar-blush { position: absolute; transition: opacity 220ms var(--ease), transform 220ms var(--ease), border-radius 220ms var(--ease), border-color 220ms var(--ease); }
+.wife-avatar-brows { top: 6px; left: 4px; width: 16px; height: 4px; }
+.wife-avatar-brows::before, .wife-avatar-brows::after { position: absolute; top: 0; width: 7px; height: 2px; border-radius: 99px; background: var(--wife-ink); content: ""; }
+.wife-avatar-brows::before { left: 0; transform: rotate(18deg); }
+.wife-avatar-brows::after { right: 0; transform: rotate(-18deg); }
+.wife-avatar-eyes { top: 11px; left: 5px; width: 14px; height: 5px; }
+.wife-avatar-eyes::before, .wife-avatar-eyes::after { position: absolute; top: 0; width: 3px; height: 4px; border-radius: 50%; background: var(--wife-ink); content: ""; }
+.wife-avatar-eyes::before { left: 0; }
+.wife-avatar-eyes::after { right: 0; }
+.wife-avatar-mouth { top: 20px; left: 7px; width: 10px; height: 2px; border-radius: 99px; background: var(--wife-ink); }
+.wife-avatar-blush { top: 14px; left: 2px; width: 4px; height: 3px; border-radius: 50%; background: var(--wife-cheek); box-shadow: 16px 0 0 var(--wife-cheek); opacity: 0.38; }
 .wife-avatar-earring { position: absolute; z-index: 3; top: 29px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--wife-jewellery); box-shadow: 0 1px 0 rgba(59, 42, 50, 0.18); }
-.wife-avatar-sparkle { position: absolute; z-index: 4; top: 4px; right: 4px; width: 7px; height: 7px; background: var(--wife-jewellery); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
+.wife-avatar-sparkle { position: absolute; z-index: 4; top: 4px; right: 4px; width: 7px; height: 7px; background: var(--wife-jewellery); clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); opacity: 0; transform: scale(0.35) rotate(-18deg); transition: opacity 220ms var(--ease), transform 220ms var(--ease); }
+.wife-avatar-delighted { transform: translateX(-50%) rotate(-3deg) scale(1.06); }
+.wife-avatar-delighted .wife-avatar-brows { opacity: 0; transform: translateY(-1px); }
+.wife-avatar-delighted .wife-avatar-eyes::before, .wife-avatar-delighted .wife-avatar-eyes::after { top: -1px; width: 6px; height: 4px; border: 2px solid var(--wife-ink); border-top: 0; border-radius: 0 0 8px 8px; background: transparent; }
+.wife-avatar-delighted .wife-avatar-eyes::before { left: -1px; }
+.wife-avatar-delighted .wife-avatar-eyes::after { right: -1px; }
+.wife-avatar-delighted .wife-avatar-mouth { top: 18px; height: 6px; border: 2px solid var(--wife-ink); border-top: 0; border-radius: 0 0 9px 9px; background: transparent; }
+.wife-avatar-delighted .wife-avatar-blush { opacity: 0.82; transform: scale(1.08); }
+.wife-avatar-delighted .wife-avatar-sparkle { opacity: 1; transform: scale(1) rotate(0); }
+.wife-avatar-unhappy { transform: translateX(-50%) scale(0.94); filter: saturate(0.78); }
+.wife-avatar-unhappy .wife-avatar-brows::before { transform: rotate(-22deg); }
+.wife-avatar-unhappy .wife-avatar-brows::after { transform: rotate(22deg); }
+.wife-avatar-unhappy .wife-avatar-mouth { top: 20px; height: 5px; border: 2px solid var(--wife-ink); border-bottom: 0; border-radius: 9px 9px 0 0; background: transparent; }
+.wife-avatar-unhappy .wife-avatar-blush { opacity: 0.08; }
 .meter-track { height: 10px; margin: 3px 0 10px; overflow: hidden; border-radius: 99px; background: var(--meter-track); }
 .meter-track span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), var(--teal)); transition: width 320ms var(--ease); }
 .playful-note { color: var(--muted); font-size: 0.74rem; font-weight: 500; line-height: 1.45; }

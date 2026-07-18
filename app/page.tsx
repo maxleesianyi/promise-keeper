@@ -16,6 +16,7 @@ type PromiseItem = {
 type Reward = { title: string; value: number };
 type RewardDraft = { title: string; value: string };
 type Theme = "dark" | "light";
+type MeterMood = "delighted" | "annoyed" | "unhappy";
 type Notice = {
   message: string;
   tone: "success" | "warning" | "neutral";
@@ -173,6 +174,8 @@ export default function Home() {
   const rewardUnlocked = missedTotal >= reward.value;
   const activePromises = promises.filter((item) => item.status === "due" || item.status === "needs-date");
   const meterProgress = Math.min((missedTotal / reward.value) * 100, 100);
+  const meterMood: MeterMood = meterProgress <= 12 || meterProgress >= 88 ? "delighted" : meterProgress <= 35 || meterProgress >= 65 ? "annoyed" : "unhappy";
+  const meterMoodLabel = meterMood === "delighted" ? "extremely happy" : meterMood === "annoyed" ? "annoyed" : "most unhappy";
   const waitingLabel = activePromises.length === 1 ? "1 task waiting" : `${activePromises.length} tasks waiting`;
 
   function persistTask(id: string, updates: Partial<Pick<PromiseItem, "status" | "title">>) {
@@ -318,8 +321,8 @@ export default function Home() {
             <p className="meter-caption">of {formatCurrency(reward.value)} toward The Wife’s {reward.title}</p>
           </div>
           <button className="reward-edit-button" type="button" onClick={startRewardEdit} aria-expanded={isEditingReward} aria-controls="reward-settings">Edit reward</button>
-          <div className="meter-journey" role="img" aria-label="The Wife wins whether the task is completed or the reward is unlocked">
-            <div className="meter-faces" aria-hidden="true"><WifeAvatar /><WifeAvatar /></div>
+          <div className="meter-journey" role="img" aria-label={`The Wife is ${meterMoodLabel} at ${Math.round(meterProgress)} percent of the Penalty Meter. She wins whether tasks are done or her reward is unlocked.`}>
+            <div className="meter-character-rail" aria-hidden="true"><WifeAvatar mood={meterMood} progress={meterProgress} /></div>
             <div className="meter-track" aria-hidden="true"><span style={{ width: `${meterProgress}%` }} /></div>
           </div>
           <p className="playful-note">Every miss brings the reward closer.</p>
@@ -396,6 +399,6 @@ function HistoryCard({ item, onEdit }: { item: PromiseItem; onEdit: (item: Promi
   return <article className="history-card"><button type="button" className="history-edit-button" onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`}><span className={`history-status ${missed ? "missed" : "complete"}`}>{missed ? "MISS" : "DONE"}</span><span className="history-copy"><h3>{item.title}</h3><p>{item.dueText}</p></span><strong>{missed ? "+$100" : "Done already"}</strong><span className="history-chevron" aria-hidden="true">›</span></button></article>;
 }
 
-function WifeAvatar() {
-  return <span className="wife-avatar"><span className="wife-avatar-hair" /><span className="wife-avatar-face"><span className="wife-avatar-blush" /></span><span className="wife-avatar-earring" /><span className="wife-avatar-sparkle" /></span>;
+function WifeAvatar({ mood, progress }: { mood: MeterMood; progress: number }) {
+  return <span className={`wife-avatar wife-avatar-${mood}`} style={{ left: `clamp(21px, ${progress}%, calc(100% - 21px))` }}><span className="wife-avatar-hair" /><span className="wife-avatar-face"><span className="wife-avatar-brows" /><span className="wife-avatar-eyes" /><span className="wife-avatar-mouth" /><span className="wife-avatar-blush" /></span><span className="wife-avatar-earring" /><span className="wife-avatar-sparkle" /></span>;
 }

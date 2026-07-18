@@ -92,9 +92,9 @@ The source code and interaction flow are complete. The first local build verific
 
 - GPT receives a compact list of active saved tasks when analysing a Telegram message. It may automatically merge a high-confidence, explicitly linked follow-up into exactly one active task; it must not guess when the target is unclear.
 - Recent tasks are now editable records: the user can correct the task wording and toggle an outcome between **Do already** and **Miss**. The saved dashboard record and Penalty Meter follow that correction.
-- The Penalty Meter keeps **Edit reward** at its top-right. Two matching minimalist happy-wife markers sit at opposite ends of the progress bar to make the intended win-win framing explicit: finishing helps today, and a miss funds her chosen reward.
+- The Penalty Meter keeps **Edit reward** at its top-right. Its character marker makes the intended win-win framing explicit: finishing helps today, and a miss funds her chosen reward.
 
-## 18 July 2026 — Demo address and meter character badges
+## 18 July 2026 — Demo address and meter character journey
 
 - The hosted demo’s visible title is **Do already demo**. Its provider-generated `promise-keeper-demo` URL slug is fixed; a future `do-already-demo` address requires a domain owned by the project owner, rather than a rename that might break the live Telegram webhook.
-- The two Penalty Meter markers are matching CSS-drawn character badges, with hair, face, blush, earring, and sparkle details. They intentionally depict a generic, cheerful character rather than claiming to portray a real person.
+- One CSS-drawn character now travels above the Penalty Meter instead of sitting at both ends. Her expression follows the meter: extremely happy at 0%, annoyed as it moves toward the centre, most unhappy around 50%, then annoyed and finally extremely happy again once The Wife’s reward is unlocked. It intentionally depicts a generic character rather than claiming to portray a real person.
