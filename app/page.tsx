@@ -39,6 +39,7 @@ function getStoredPromises() {
 export default function Home() {
   const [promises, setPromises] = useState<PromiseItem[]>(starterPromises);
   const [notice, setNotice] = useState<Notice | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => setPromises(getStoredPromises()), []);
   useEffect(() => {
@@ -104,9 +105,18 @@ export default function Home() {
     setNotice({ message: "Back on your list.", tone: "neutral" });
   }
 
-  function resetDemo() {
-    setPromises(starterPromises);
-    setNotice({ message: "Demo reset.", tone: "neutral" });
+  async function resetDemo() {
+    setIsResetting(true);
+    try {
+      const response = await fetch("/api/promises", { method: "DELETE" });
+      if (!response.ok) throw new Error("Reset failed");
+      setPromises(starterPromises);
+      setNotice({ message: "Demo reset to its original state.", tone: "neutral" });
+    } catch {
+      setNotice({ message: "Couldn’t reset the saved Telegram tasks. Please try again.", tone: "warning" });
+    } finally {
+      setIsResetting(false);
+    }
   }
 
   async function copyReward() {
@@ -127,7 +137,7 @@ export default function Home() {
             <h1>{waitingLabel}</h1>
             <p className="header-subtitle">Live from your Telegram approvals</p>
           </div>
-          <button className="reset-button" onClick={resetDemo}>Reset demo</button>
+          <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
         </header>
 
         <section className="promises-section" aria-labelledby="promises-heading">
