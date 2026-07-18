@@ -49,16 +49,16 @@ function getStoredReward(): Reward {
     if (typeof parsed.title !== "string" || !parsed.title.trim() || !Number.isFinite(parsed.value) || parsed.value! < 1) {
       return DEFAULT_REWARD;
     }
-    return { title: parsed.title.trim(), value: Math.round(parsed.value) };
+    return { title: parsed.title.trim(), value: Math.max(10, Math.round(parsed.value! / 10) * 10) };
   } catch {
     return DEFAULT_REWARD;
   }
 }
 
 function getStoredTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  const saved = window.localStorage.getItem("do-already-theme");
-  return saved === "light" || saved === "dark" ? saved : "dark";
+  if (typeof window === "undefined") return "light";
+  const saved = window.localStorage.getItem("do-already-theme-v2");
+  return saved === "light" || saved === "dark" ? saved : "light";
 }
 
 function formatCurrency(value: number) {
@@ -73,7 +73,7 @@ export default function Home() {
   const [promises, setPromises] = useState<PromiseItem[]>(starterPromises);
   const [reward, setReward] = useState<Reward>(DEFAULT_REWARD);
   const [rewardDraft, setRewardDraft] = useState<RewardDraft>({ title: DEFAULT_REWARD.title, value: String(DEFAULT_REWARD.value) });
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [hasLoadedLocalSettings, setHasLoadedLocalSettings] = useState(false);
   const [isEditingReward, setIsEditingReward] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -94,7 +94,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!hasLoadedLocalSettings) return;
-    window.localStorage.setItem("do-already-theme", theme);
+    window.localStorage.setItem("do-already-theme-v2", theme);
   }, [hasLoadedLocalSettings, theme]);
 
   useEffect(() => {
@@ -182,8 +182,8 @@ export default function Home() {
     event.preventDefault();
     const title = rewardDraft.title.trim();
     const value = Math.round(Number(rewardDraft.value));
-    if (!title || !Number.isFinite(value) || value < 1) {
-      setNotice({ message: "Add a reward name and a value above $0.", tone: "warning" });
+    if (!title || !Number.isFinite(value) || value < 10 || value % 10 !== 0) {
+      setNotice({ message: "Use a reward name and a value in $10 steps.", tone: "warning" });
       return;
     }
     setReward({ title, value });
@@ -220,8 +220,8 @@ export default function Home() {
       <section className="phone-frame" aria-label="Do Already dashboard">
         <header className="topbar">
           <div>
-            <p className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></p>
-            <h1>{waitingLabel}</h1>
+            <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
+            <p className="waiting-label">{waitingLabel}</p>
             <p className="header-subtitle">Live from your chat with The Wife</p>
           </div>
           <div className="topbar-actions">
@@ -232,7 +232,7 @@ export default function Home() {
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
-              {theme === "dark" ? "Light mode" : "Dark mode"}
+              <span className={`theme-icon ${theme}`} aria-hidden="true" />
             </button>
             <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
           </div>
@@ -252,7 +252,6 @@ export default function Home() {
             <p className="meter-value">{formatCurrency(missedTotal)}</p>
             <p className="meter-caption">of {formatCurrency(reward.value)} toward The Wife’s {reward.title}</p>
           </div>
-          <div className="reward-stamp" aria-hidden="true"><span>{rewardMark(reward.title)}</span></div>
           <button className="reward-edit-button" onClick={startRewardEdit} aria-expanded={isEditingReward} aria-controls="reward-settings">Edit reward</button>
           <div className="meter-track" aria-hidden="true"><span style={{ width: `${meterProgress}%` }} /></div>
           <p className="playful-note">Every miss brings the reward closer.</p>
@@ -262,7 +261,7 @@ export default function Home() {
           <form className="reward-editor" id="reward-settings" onSubmit={saveReward}>
             <div className="reward-editor-heading"><div><p className="eyebrow">SET THE REWARD</p><h2>What does The Wife want?</h2></div><button type="button" className="editor-close" onClick={cancelRewardEdit} aria-label="Close reward editor">×</button></div>
             <label>Reward<input value={rewardDraft.title} onChange={(event) => setRewardDraft((draft) => ({ ...draft, title: event.target.value }))} placeholder="Spa day, staycation…" /></label>
-            <label>Value (SGD)<input type="number" min="1" step="10" inputMode="numeric" value={rewardDraft.value} onChange={(event) => setRewardDraft((draft) => ({ ...draft, value: event.target.value }))} /></label>
+            <label>Value (SGD)<input type="number" min="10" step="10" inputMode="numeric" value={rewardDraft.value} onChange={(event) => setRewardDraft((draft) => ({ ...draft, value: event.target.value }))} /></label>
             <div className="reward-editor-actions"><button type="button" className="editor-cancel" onClick={cancelRewardEdit}>Cancel</button><button className="editor-save" type="submit">Save reward</button></div>
           </form>
         )}

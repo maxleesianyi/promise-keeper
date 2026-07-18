@@ -16,7 +16,7 @@ The demo uses a fictional husband-and-wife scenario. The broader idea is suitabl
 - Store confirmed promise details locally in the browser.
 - Mark promises completed or missed.
 - Add $100 per missed promise and work toward a reward chosen in the dashboard; both the reward and its SGD value are editable on that device.
-- Switch between the Interviewer Buddy-inspired midnight and cool-light dashboard themes; the choice is remembered on that device.
+- Start in the Interviewer Buddy-inspired cool-light dashboard, or switch to midnight mode with the theme icon; the choice is remembered on that device.
 - Copy a warm reward message; no automatic purchase or message is sent.
 - Optional hackathon demo integration: a consented private Telegram group automatically saves only clear, high-confidence tasks; medium-confidence messages receive a one-tap **Save promise** card.
 

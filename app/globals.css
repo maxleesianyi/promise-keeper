@@ -46,7 +46,7 @@
   --ease: cubic-bezier(0.2, 0, 0, 1);
 }
 
-:root[data-theme="light"] {
+:root:not([data-theme]), :root[data-theme="light"] {
   --canvas: #f6f8fc;
   --surface: #ffffff;
   --surface-raised: #fbfcff;
@@ -103,14 +103,20 @@ h1, h2, h3 { text-wrap: balance; }
 .phone-frame { width: min(100%, 480px); margin: 0 auto; }
 .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 8px 4px 20px; }
 .topbar-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-.wordmark, .eyebrow { color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.11em; line-height: 1.25; }
-.wordmark { margin-bottom: 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; letter-spacing: -0.03em; text-transform: none; }
-.wordmark strong { color: var(--accent); font-size: 0.82rem; letter-spacing: -0.04em; text-shadow: 0 0 20px var(--wordmark-glow); }
-h1 { max-width: 300px; font-size: clamp(2rem, 8vw, 2.55rem); font-weight: 800; letter-spacing: -0.07em; line-height: 1.02; }
+.eyebrow { color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.11em; line-height: 1.25; }
+.wordmark { max-width: 360px; color: var(--ink); font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif; font-size: clamp(2.5rem, 11vw, 3.45rem); font-weight: 800; letter-spacing: -0.085em; line-height: 0.98; }
+.wordmark strong { color: var(--accent); text-shadow: 0 0 20px var(--wordmark-glow); }
+h1 { margin: 0; text-wrap: balance; }
 h2 { font-size: 1.18rem; letter-spacing: -0.04em; line-height: 1.2; }
 h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
-.header-subtitle { margin-top: 8px; color: var(--muted); font-size: 0.8rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
+.waiting-label { margin-top: 16px; color: var(--muted-strong); font-size: clamp(0.85rem, 3.8vw, 1rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.35; white-space: nowrap; }
+.header-subtitle { margin-top: 5px; color: var(--muted); font-size: 0.8rem; font-weight: 500; line-height: 1.45; text-wrap: pretty; }
 .reset-button, .theme-toggle { min-height: 44px; padding: 0 14px; border-radius: 12px; background: var(--surface-tint); color: var(--accent-strong); box-shadow: inset 0 0 0 1px var(--line-inset); font-size: 0.74rem; font-weight: 800; transition-duration: 180ms; transition-property: background-color, color, box-shadow, transform; transition-timing-function: var(--ease); }
+.theme-toggle { display: grid; width: 44px; padding: 0; place-items: center; }
+.theme-icon { position: relative; display: block; width: 16px; height: 16px; color: currentColor; }
+.theme-icon.light { border-radius: 50%; background: currentColor; box-shadow: 0 -7px 0 -5px currentColor, 0 7px 0 -5px currentColor, 7px 0 0 -5px currentColor, -7px 0 0 -5px currentColor; }
+.theme-icon.dark { overflow: hidden; border-radius: 50%; background: currentColor; }
+.theme-icon.dark::after { position: absolute; top: -3px; right: -4px; width: 15px; height: 15px; border-radius: 50%; background: var(--surface-tint); content: ""; }
 .reset-button:hover, .theme-toggle:hover { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent-outline-strong); }
 .reset-button:disabled { cursor: not-allowed; opacity: 0.62; }
 .reset-button:active, .theme-toggle:active, .status-actions button:active, .copy-button:active, .notice button:active, .reward-edit-button:active, .reward-editor-actions button:active, .editor-close:active { transform: scale(0.96); }
@@ -207,10 +213,15 @@ h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
   .phone-frame { padding: 28px 24px 40px; border-radius: 32px; background: var(--frame-surface); box-shadow: 0 0 0 1px var(--line-inset), var(--frame-shadow); }
 }
 
+@media (max-width: 520px) {
+  .topbar { flex-direction: column; gap: 16px; }
+  .topbar-actions { width: 100%; justify-content: flex-start; }
+}
+
 @media (max-width: 380px) {
   .topbar { gap: 10px; }
   .topbar-actions { gap: 6px; }
-  .reset-button, .theme-toggle { padding: 0 10px; }
+  .reset-button { padding: 0 10px; }
   .status-actions { grid-template-columns: 1fr; }
   .reward-stamp { width: 58px; height: 50px; right: 18px; }
 }

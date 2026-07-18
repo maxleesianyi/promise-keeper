@@ -71,3 +71,9 @@ The source code and interaction flow are complete. The first local build verific
 
 - Do Already? keeps the midnight dashboard as its default, while adding the Interviewer Buddy’s cool-light theme as a user-controlled alternative.
 - The theme switch is remembered on the current device. It changes only presentation, never Telegram tasks, promises, or reward data.
+
+## 18 July 2026 — Light-first dashboard refinements
+
+- The cool-light Interviewer Buddy theme is now the default, while midnight remains one tap away through an icon-only, labelled theme control.
+- The product name is the primary heading, the task count is supporting one-line copy, and the reward stamp is removed from the Penalty Meter.
+- Reward values are constrained to clear SGD $10 increments, preventing the earlier $1-offset values such as $491 or $501.

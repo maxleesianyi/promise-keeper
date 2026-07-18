@@ -7,9 +7,10 @@
 3. Select **Jason needs his swimming gear tomorrow** and choose **Find the promise**.
 4. Confirm the editable AI draft appears; save it.
 5. Mark the saved promise **Aiya I forgot**.
-6. Choose **Edit reward**, set a different reward and SGD value, then save it. Confirm the Penalty Meter and reward note update immediately.
+6. Choose **Edit reward**, set a different reward and a value in $10 SGD steps, then save it. Confirm the Penalty Meter and reward note update immediately.
 7. Confirm the meter reaches the chosen value and the reward message can be copied.
 8. Select **Reset demo** and confirm the starting task state returns.
+9. Confirm the dashboard starts in cool-light mode. Tap the theme icon to switch to midnight, refresh, and confirm the chosen theme remains.
 
 ## Safety checks
 
