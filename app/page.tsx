@@ -481,7 +481,7 @@ export default function Home() {
         <aside className="demo-chat-panel" id="try-it-out-chat" aria-label="Telegram-style task demo">
           <section className="demo-chat" ref={demoChatRef} aria-labelledby="demo-chat-title">
             <header className="demo-chat-header">
-              <span className="demo-chat-avatar" aria-hidden="true"><img className="demo-chat-logo" src="/do-already-mark.png" alt="" /></span>
+              <WifeAvatar mood="annoyed" className="demo-chat-avatar" />
               <div><p id="demo-chat-title">The Wife + Do Already?</p><span>Demo group chat · 2 members</span></div>
               <button type="button" className="demo-chat-close" onClick={() => setIsDemoChatOpen(false)} aria-label="Close demo chat">×</button>
             </header>
@@ -530,6 +530,7 @@ function HistoryCard({ item, onEdit }: { item: PromiseItem; onEdit: (item: Promi
   return <article className="history-card"><button type="button" className="history-edit-button" onClick={() => onEdit(item)} aria-label={`Edit ${item.title}`}><span className={`history-status ${missed ? "missed" : "complete"}`}>{missed ? "MISS" : "DONE"}</span><span className="history-copy"><h3>{item.title}</h3><p>{item.dueText}</p></span><strong>{missed ? "+$100" : "Done already"}</strong><span className="history-chevron" aria-hidden="true">›</span></button></article>;
 }
 
-function WifeAvatar({ mood, progress }: { mood: MeterMood; progress: number }) {
-  return <span className={`wife-avatar wife-avatar-${mood}`} style={{ left: `clamp(21px, ${progress}%, calc(100% - 21px))` }}><span className="wife-avatar-hair" /><span className="wife-avatar-face"><span className="wife-avatar-brows" /><span className="wife-avatar-eyes" /><span className="wife-avatar-mouth" /><span className="wife-avatar-blush" /></span><span className="wife-avatar-earring" /><span className="wife-avatar-sparkle" /></span>;
+function WifeAvatar({ mood, progress, className }: { mood: MeterMood; progress?: number; className?: string }) {
+  const style = progress === undefined ? undefined : { left: `clamp(21px, ${progress}%, calc(100% - 21px))` };
+  return <span className={`wife-avatar wife-avatar-${mood}${className ? ` ${className}` : ""}`} style={style} aria-hidden={className ? true : undefined}><span className="wife-avatar-hair" /><span className="wife-avatar-face"><span className="wife-avatar-brows" /><span className="wife-avatar-eyes" /><span className="wife-avatar-mouth" /><span className="wife-avatar-blush" /></span><span className="wife-avatar-earring" /><span className="wife-avatar-sparkle" /></span>;
 }

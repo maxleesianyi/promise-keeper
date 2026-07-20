@@ -277,8 +277,7 @@ h3 { font-size: 1rem; letter-spacing: -0.03em; line-height: 1.35; }
 .demo-chat-panel { order: 0; width: min(100%, 480px); margin: 0 auto 24px; }
 .demo-chat { width: 100%; max-height: min(82dvh, 700px); overflow: hidden; border-radius: 26px 26px 18px 18px; background: var(--surface); box-shadow: var(--shadow-float); color: var(--ink); animation: demo-chat-enter 240ms var(--ease) both; }
 .demo-chat-header { display: grid; grid-template-columns: 42px minmax(0, 1fr) 44px; gap: 10px; align-items: center; min-height: 66px; padding: 11px 12px; background: var(--accent); color: var(--surface); }
-.demo-chat-avatar { position: relative; display: grid; width: 42px; height: 42px; place-items: center; overflow: hidden; border-radius: 50%; background: #0b0d0f; box-shadow: inset 0 0 0 1px var(--line-inset); }
-.demo-chat-logo { position: absolute; top: 50%; left: 50%; width: 84px; height: 84px; transform: translate(-50%, -50%); }
+.demo-chat-avatar { position: relative; bottom: auto; left: auto !important; flex: 0 0 42px; transform: scale(0.88); }
 .demo-chat-header p { font-size: 0.92rem; font-weight: 800; line-height: 1.2; }
 .demo-chat-header span:not(.demo-chat-avatar) { display: block; margin-top: 3px; color: color-mix(in srgb, var(--surface) 78%, transparent); font-size: 0.68rem; font-weight: 600; line-height: 1.2; }
 .demo-chat-close { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; background: transparent; color: var(--surface); font-size: 1.55rem; line-height: 1; transition: background-color 180ms var(--ease), transform 180ms var(--ease); }

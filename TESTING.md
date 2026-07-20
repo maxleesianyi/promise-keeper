@@ -10,6 +10,7 @@
 6. Tap the theme icon, refresh, and confirm the theme choice is remembered on that device.
 7. Tap **Reset demo** and confirm the dashboard returns to its starter task state.
 8. Tap **Try it out**, write “Can you pack Jason’s swimming gear for tomorrow?”, and press **Enter**. Confirm the chat recognises the task and saves it into **Don’t forget ah**. Tap **Try it out** again to close the companion panel.
+9. Confirm the chat header uses the mildly annoyed wife character from the Penalty Meter.
 
 ## Telegram demo — optional configured path
 
