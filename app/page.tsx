@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Status = "due" | "completed" | "missed" | "needs-date";
 type PromiseItem = {
@@ -41,7 +41,6 @@ const starterPromises: PromiseItem[] = [
   { id: "groceries", title: "Pick up groceries for the weekend", category: "Errand", dueText: "Completed · Today", relevantPerson: "The Wife", preparation: "Milk, fruit, and coffee.", confidence: "High", status: "completed" },
 ];
 const demoChatWelcome: DemoChatMessage[] = [
-  { id: "demo-welcome", kind: "status", text: "Telegram-style demo. Nothing is sent to Telegram." },
   { id: "demo-wife-welcome", kind: "message", sender: "wife", text: "Try typing a clear request as The Wife. Do Already? will check whether it should become a task." },
 ];
 
@@ -381,6 +380,12 @@ export default function Home() {
     }
   }
 
+  function sendDemoMessageOnEnter(event: ReactKeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    event.currentTarget.form?.requestSubmit();
+  }
+
   return (
     <main className={`app-shell ${isDemoChatOpen ? "demo-chat-open" : ""}`}>
       <section className="phone-frame" aria-label="Do Already dashboard">
@@ -401,7 +406,7 @@ export default function Home() {
             <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
             <p className="waiting-label">{waitingLabel}</p>
             <p className="header-subtitle">Live from your chat with The Wife</p>
-            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen(true)} aria-expanded={isDemoChatOpen} aria-controls="try-it-out-chat">Try it out<span aria-hidden="true">→</span></button>
+            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen((current) => !current)} aria-expanded={isDemoChatOpen} aria-controls="try-it-out-chat"><span aria-hidden="true">←</span>Try it out</button>
           </div>
         </header>
 
@@ -474,15 +479,14 @@ export default function Home() {
 
       {isDemoChatOpen && (
         <aside className="demo-chat-panel" id="try-it-out-chat" aria-label="Telegram-style task demo">
-          <section className="demo-chat" ref={demoChatRef} aria-labelledby="demo-chat-title" aria-describedby="demo-chat-description">
+          <section className="demo-chat" ref={demoChatRef} aria-labelledby="demo-chat-title">
             <header className="demo-chat-header">
-              <span className="demo-chat-avatar" aria-hidden="true">TW</span>
+              <span className="demo-chat-avatar" aria-hidden="true"><img className="demo-chat-logo" src="/do-already-mark.png" alt="" /></span>
               <div><p id="demo-chat-title">The Wife + Do Already?</p><span>Demo group chat · 2 members</span></div>
               <button type="button" className="demo-chat-close" onClick={() => setIsDemoChatOpen(false)} aria-label="Close demo chat">×</button>
             </header>
             <div className="demo-chat-wall" aria-live="polite">
               <p className="demo-chat-date">TODAY</p>
-              <p className="demo-chat-disclosure" id="demo-chat-description">A Telegram-style simulation. Demo tasks save only on this device.</p>
               {demoChatMessages.map((message) => (
                 message.kind === "message" ? <div className={`demo-message ${message.sender}`} key={message.id}><p>{message.sender === "wife" ? "The Wife" : "Do Already?"}</p><span>{message.text}</span><time>now</time></div>
                   : message.kind === "review" && message.task ? <div className="demo-review" key={message.id}><p>{message.text}</p><strong>{message.task.title}</strong><span>{message.task.dueText}</span><button type="button" onClick={() => saveDemoTask(message.task!, message.id)}>Save task</button></div>
@@ -493,7 +497,7 @@ export default function Home() {
             </div>
             <form className="demo-chat-composer" onSubmit={sendDemoMessage}>
               <label className="sr-only" htmlFor="demo-chat-message">Type a message from The Wife</label>
-              <textarea id="demo-chat-message" value={demoMessageDraft} onChange={(event) => setDemoMessageDraft(event.target.value)} placeholder="Type a message from The Wife" rows={1} maxLength={280} disabled={isDemoAnalysing} enterKeyHint="send" />
+              <textarea id="demo-chat-message" value={demoMessageDraft} onChange={(event) => setDemoMessageDraft(event.target.value)} onKeyDown={sendDemoMessageOnEnter} placeholder="Type a message from The Wife" rows={1} maxLength={280} disabled={isDemoAnalysing} enterKeyHint="send" />
               <button type="submit" disabled={!demoMessageDraft.trim() || isDemoAnalysing}>{isDemoAnalysing ? "Checking" : "Send"}</button>
             </form>
           </section>
