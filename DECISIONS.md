@@ -105,3 +105,7 @@ The source code and interaction flow are complete. The first local build verific
 - The simulation is clearly disclosed as local-only: it never sends a Telegram message and never writes a visitor’s demonstration task into the shared Telegram database. Medium-confidence suggestions preserve the real product’s human-approval step.
 - The demo is a companion surface rather than a blocking pop-up: it sits to the left of the dashboard on wider screens and above it on smaller screens, keeping the saved task visible in the dashboard.
 - The chat now inherits the dashboard’s light and midnight themes, uses the same mildly annoyed wife character as the Penalty Meter, sends with Enter, and is toggled open or closed through the same **Try it out** button.
+
+## 21 July 2026 — External dashboard controls
+
+- The light/dark and Reset demo controls now sit outside the dashboard: in a compact rail to its right when there is room, and in a small right-aligned strip above it on narrow screens. This clears the dashboard’s top edge so its content begins higher.

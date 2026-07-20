@@ -388,9 +388,8 @@ export default function Home() {
 
   return (
     <main className={`app-shell ${isDemoChatOpen ? "demo-chat-open" : ""}`}>
-      <section className="phone-frame" aria-label="Do Already dashboard">
-        <header className="topbar">
-          <div className="topbar-actions">
+      <div className="dashboard-column">
+        <div className="app-controls" aria-label="Dashboard controls">
             <button
               className="theme-toggle"
               type="button"
@@ -401,7 +400,9 @@ export default function Home() {
               <span className="theme-icon" aria-hidden="true" />
             </button>
             <button className="reset-button" onClick={resetDemo} disabled={isResetting}>{isResetting ? "Resetting…" : "Reset demo"}</button>
-          </div>
+        </div>
+        <section className="phone-frame" aria-label="Do Already dashboard">
+          <header className="topbar">
           <div className="header-copy">
             <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
             <p className="waiting-label">{waitingLabel}</p>
@@ -453,7 +454,8 @@ export default function Home() {
           <div className="section-heading"><div><h2 id="history-heading">Recent tasks</h2></div></div>
           {promises.filter((item) => item.status === "completed" || item.status === "missed").map((item) => <HistoryCard key={item.id} item={item} onEdit={startTaskEdit} />)}
         </section>
-      </section>
+        </section>
+      </div>
 
       {editingTask && (
         <div className="task-editor-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) cancelTaskEdit(); }}>
