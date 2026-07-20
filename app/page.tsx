@@ -195,19 +195,6 @@ export default function Home() {
       if (event.key === "Escape") {
         event.preventDefault();
         setIsDemoChatOpen(false);
-        return;
-      }
-      if (event.key !== "Tab" || !demoChatRef.current) return;
-      const focusable = Array.from(demoChatRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"));
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
       }
     };
     document.addEventListener("keydown", handleKeyDown);
@@ -395,7 +382,7 @@ export default function Home() {
   }
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell ${isDemoChatOpen ? "demo-chat-open" : ""}`}>
       <section className="phone-frame" aria-label="Do Already dashboard">
         <header className="topbar">
           <div className="topbar-actions">
@@ -414,7 +401,7 @@ export default function Home() {
             <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
             <p className="waiting-label">{waitingLabel}</p>
             <p className="header-subtitle">Live from your chat with The Wife</p>
-            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen(true)} aria-haspopup="dialog">Try it out<span aria-hidden="true">→</span></button>
+            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen(true)} aria-expanded={isDemoChatOpen} aria-controls="try-it-out-chat">Try it out<span aria-hidden="true">→</span></button>
           </div>
         </header>
 
@@ -486,8 +473,8 @@ export default function Home() {
       )}
 
       {isDemoChatOpen && (
-        <div className="demo-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsDemoChatOpen(false); }}>
-          <section className="demo-chat" ref={demoChatRef} role="dialog" aria-modal="true" aria-labelledby="demo-chat-title" aria-describedby="demo-chat-description">
+        <aside className="demo-chat-panel" id="try-it-out-chat" aria-label="Telegram-style task demo">
+          <section className="demo-chat" ref={demoChatRef} aria-labelledby="demo-chat-title" aria-describedby="demo-chat-description">
             <header className="demo-chat-header">
               <span className="demo-chat-avatar" aria-hidden="true">TW</span>
               <div><p id="demo-chat-title">The Wife + Do Already?</p><span>Demo group chat · 2 members</span></div>
@@ -510,7 +497,7 @@ export default function Home() {
               <button type="submit" disabled={!demoMessageDraft.trim() || isDemoAnalysing}>{isDemoAnalysing ? "Checking" : "Send"}</button>
             </form>
           </section>
-        </div>
+        </aside>
       )}
 
       {notice && <aside className={`notice ${notice.tone}`} role="status"><p>{notice.message}</p>{notice.undo && <button onClick={undoLastUpdate}>Undo</button>}</aside>}
