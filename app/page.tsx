@@ -388,6 +388,7 @@ export default function Home() {
 
   return (
     <main className={`app-shell ${isDemoChatOpen ? "demo-chat-open" : ""}`}>
+      <button className="try-demo-button demo-launcher" type="button" onClick={() => setIsDemoChatOpen((current) => !current)} aria-label={isDemoChatOpen ? "Close Try it out demo" : "Open Try it out demo"} aria-expanded={isDemoChatOpen} aria-controls="try-it-out-chat"><span aria-hidden="true">←</span>Try it out</button>
       <div className="dashboard-column">
         <div className="app-controls" aria-label="Dashboard controls">
             <button
@@ -407,7 +408,6 @@ export default function Home() {
             <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
             <p className="waiting-label">{waitingLabel}</p>
             <p className="header-subtitle">Live from your chat with The Wife</p>
-            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen((current) => !current)} aria-expanded={isDemoChatOpen} aria-controls="try-it-out-chat"><span aria-hidden="true">←</span>Try it out</button>
           </div>
         </header>
 

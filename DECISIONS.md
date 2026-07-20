@@ -109,3 +109,4 @@ The source code and interaction flow are complete. The first local build verific
 ## 21 July 2026 — External dashboard controls
 
 - The light/dark and Reset demo controls now sit outside the dashboard: in a compact rail to its right when there is room, and in a small right-aligned strip above it on narrow screens. This clears the dashboard’s top edge so its content begins higher.
+- **Try it out** is now an equally external, left-aligned control. It sits above the dashboard on narrow layouts and to its left on wide layouts; the companion Telegram chat expands directly beneath that control.
