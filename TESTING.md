@@ -9,6 +9,7 @@
 5. Confirm exactly one character follows the Penalty Meter progress: she is delighted at 0% and 100%, annoyed on either side of the middle, and most unhappy around 50%.
 6. Tap the theme icon, refresh, and confirm the theme choice is remembered on that device.
 7. Tap **Reset demo** and confirm the dashboard returns to its starter task state.
+8. Tap **Try it out**, write “Can you pack Jason’s swimming gear for tomorrow?”, and send it. Confirm the Telegram-style demo chat recognises the task and saves it into **Don’t forget ah**. The task stays only on that browser/device.
 
 ## Telegram demo — optional configured path
 

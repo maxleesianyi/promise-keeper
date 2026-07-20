@@ -17,6 +17,17 @@ type Reward = { title: string; value: number };
 type RewardDraft = { title: string; value: string };
 type Theme = "dark" | "light";
 type MeterMood = "delighted" | "annoyed" | "unhappy";
+type ExtractedDemoPromise = Omit<PromiseItem, "id" | "status"> & {
+  action: "new" | "update";
+  targetPromiseId: string;
+};
+type DemoChatMessage = {
+  id: string;
+  kind: "message" | "status" | "review";
+  sender?: "wife" | "do-already";
+  text: string;
+  task?: PromiseItem;
+};
 type Notice = {
   message: string;
   tone: "success" | "warning" | "neutral";
@@ -28,6 +39,10 @@ const starterPromises: PromiseItem[] = [
   { id: "dog-food", title: "Buy dog food before coming home", category: "Errand", dueText: "Missed · Tue, 14 Jul", relevantPerson: "The Wife", preparation: "Pick up the usual brand on the way home.", confidence: "High", status: "missed" },
   { id: "dinner", title: "Book anniversary dinner", category: "Important date", dueText: "Missed · Wed, 15 Jul", relevantPerson: "The Wife", preparation: "Choose a restaurant and reserve a table.", confidence: "High", status: "missed" },
   { id: "groceries", title: "Pick up groceries for the weekend", category: "Errand", dueText: "Completed · Today", relevantPerson: "The Wife", preparation: "Milk, fruit, and coffee.", confidence: "High", status: "completed" },
+];
+const demoChatWelcome: DemoChatMessage[] = [
+  { id: "demo-welcome", kind: "status", text: "Telegram-style demo. Nothing is sent to Telegram." },
+  { id: "demo-wife-welcome", kind: "message", sender: "wife", text: "Try typing a clear request as The Wife. Do Already? will check whether it should become a task." },
 ];
 
 function getStoredPromises() {
@@ -82,7 +97,12 @@ export default function Home() {
   const [taskStatusDraft, setTaskStatusDraft] = useState<"completed" | "missed">("completed");
   const [notice, setNotice] = useState<Notice | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [isDemoChatOpen, setIsDemoChatOpen] = useState(false);
+  const [demoMessageDraft, setDemoMessageDraft] = useState("");
+  const [demoChatMessages, setDemoChatMessages] = useState<DemoChatMessage[]>(demoChatWelcome);
+  const [isDemoAnalysing, setIsDemoAnalysing] = useState(false);
   const taskEditorRef = useRef<HTMLDivElement>(null);
+  const demoChatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const storedReward = getStoredReward();
@@ -166,6 +186,37 @@ export default function Home() {
       previouslyFocused?.focus();
     };
   }, [editingTask]);
+
+  useEffect(() => {
+    if (!isDemoChatOpen) return;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusComposer = window.setTimeout(() => demoChatRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus(), 0);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsDemoChatOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || !demoChatRef.current) return;
+      const focusable = Array.from(demoChatRef.current.querySelectorAll<HTMLElement>("button:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex='-1'])"));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.clearTimeout(focusComposer);
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [isDemoChatOpen]);
 
   const missedTotal = useMemo(
     () => promises.filter((item) => item.status === "missed").length * 100,
@@ -283,6 +334,66 @@ export default function Home() {
     }
   }
 
+  function makeDemoTask(extracted: ExtractedDemoPromise): PromiseItem {
+    return {
+      id: `demo-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title: extracted.title,
+      category: extracted.category,
+      dueText: extracted.dueText,
+      relevantPerson: extracted.relevantPerson || "The Wife",
+      preparation: extracted.preparation,
+      confidence: extracted.confidence,
+      status: extracted.dueText === "No date yet" ? "needs-date" : "due",
+    };
+  }
+
+  function saveDemoTask(task: PromiseItem, reviewId?: string) {
+    setPromises((current) => [task, ...current]);
+    if (reviewId) {
+      setDemoChatMessages((current) => current.map((message) => (
+        message.id === reviewId ? { id: `${reviewId}-saved`, kind: "status", text: `Saved to your dashboard: ${task.title}` } : message
+      )));
+    } else {
+      setDemoChatMessages((current) => [...current, { id: `demo-saved-${task.id}`, kind: "status", text: `Saved to your dashboard: ${task.title}` }]);
+    }
+    setNotice({ message: "Demo task saved to Don’t forget ah.", tone: "success" });
+  }
+
+  async function sendDemoMessage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const message = demoMessageDraft.trim();
+    if (!message || isDemoAnalysing) return;
+
+    const sentId = `demo-sent-${Date.now()}`;
+    setDemoChatMessages((current) => [...current, { id: sentId, kind: "message", sender: "wife", text: message }]);
+    setDemoMessageDraft("");
+    setIsDemoAnalysing(true);
+
+    try {
+      const response = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const payload = await response.json() as { promise?: ExtractedDemoPromise; message?: string };
+      if (!response.ok || !payload.promise || payload.promise.confidence === "Low") {
+        setDemoChatMessages((current) => [...current, { id: `demo-no-task-${sentId}`, kind: "status", text: payload.message || "No clear task found. Try a specific request with an action." }]);
+        return;
+      }
+
+      const task = makeDemoTask(payload.promise);
+      if (task.confidence === "High") {
+        saveDemoTask(task);
+        return;
+      }
+      setDemoChatMessages((current) => [...current, { id: `demo-review-${task.id}`, kind: "review", text: "This sounds like a task. Save it to the dashboard?", task }]);
+    } catch {
+      setDemoChatMessages((current) => [...current, { id: `demo-error-${sentId}`, kind: "status", text: "The task checker could not respond. Try again in a moment." }]);
+    } finally {
+      setIsDemoAnalysing(false);
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="phone-frame" aria-label="Do Already dashboard">
@@ -303,6 +414,7 @@ export default function Home() {
             <h1 className="wordmark"><span>You </span><strong>Do Already</strong><span> or not?</span></h1>
             <p className="waiting-label">{waitingLabel}</p>
             <p className="header-subtitle">Live from your chat with The Wife</p>
+            <button className="try-demo-button" type="button" onClick={() => setIsDemoChatOpen(true)} aria-haspopup="dialog">Try it out<span aria-hidden="true">→</span></button>
           </div>
         </header>
 
@@ -370,6 +482,34 @@ export default function Home() {
               <div className="task-editor-actions"><button type="button" className="editor-cancel" onClick={cancelTaskEdit}>Cancel</button><button className="editor-save" type="submit">Save task</button></div>
             </form>
           </div>
+        </div>
+      )}
+
+      {isDemoChatOpen && (
+        <div className="demo-chat-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setIsDemoChatOpen(false); }}>
+          <section className="demo-chat" ref={demoChatRef} role="dialog" aria-modal="true" aria-labelledby="demo-chat-title" aria-describedby="demo-chat-description">
+            <header className="demo-chat-header">
+              <span className="demo-chat-avatar" aria-hidden="true">TW</span>
+              <div><p id="demo-chat-title">The Wife + Do Already?</p><span>Demo group chat · 2 members</span></div>
+              <button type="button" className="demo-chat-close" onClick={() => setIsDemoChatOpen(false)} aria-label="Close demo chat">×</button>
+            </header>
+            <div className="demo-chat-wall" aria-live="polite">
+              <p className="demo-chat-date">TODAY</p>
+              <p className="demo-chat-disclosure" id="demo-chat-description">A Telegram-style simulation. Demo tasks save only on this device.</p>
+              {demoChatMessages.map((message) => (
+                message.kind === "message" ? <div className={`demo-message ${message.sender}`} key={message.id}><p>{message.sender === "wife" ? "The Wife" : "Do Already?"}</p><span>{message.text}</span><time>now</time></div>
+                  : message.kind === "review" && message.task ? <div className="demo-review" key={message.id}><p>{message.text}</p><strong>{message.task.title}</strong><span>{message.task.dueText}</span><button type="button" onClick={() => saveDemoTask(message.task!, message.id)}>Save task</button></div>
+                    : <p className="demo-chat-status" key={message.id}>{message.text}</p>
+              ))}
+              {isDemoAnalysing && <p className="demo-chat-status demo-chat-checking">Do Already? is checking…</p>}
+              <div className="demo-suggestions"><p>Try a clear task:</p><button type="button" onClick={() => setDemoMessageDraft("Can you pack Jason’s swimming gear for tomorrow?")}>Pack Jason’s swimming gear for tomorrow</button><button type="button" onClick={() => setDemoMessageDraft("Please buy dog food before coming home.")}>Buy dog food before coming home</button></div>
+            </div>
+            <form className="demo-chat-composer" onSubmit={sendDemoMessage}>
+              <label className="sr-only" htmlFor="demo-chat-message">Type a message from The Wife</label>
+              <textarea id="demo-chat-message" value={demoMessageDraft} onChange={(event) => setDemoMessageDraft(event.target.value)} placeholder="Type a message from The Wife" rows={1} maxLength={280} disabled={isDemoAnalysing} enterKeyHint="send" />
+              <button type="submit" disabled={!demoMessageDraft.trim() || isDemoAnalysing}>{isDemoAnalysing ? "Checking" : "Send"}</button>
+            </form>
+          </section>
         </div>
       )}
 

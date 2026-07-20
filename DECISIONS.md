@@ -98,3 +98,8 @@ The source code and interaction flow are complete. The first local build verific
 
 - The hosted demo’s visible title is **Do already demo**. Its provider-generated `promise-keeper-demo` URL slug is fixed; a future `do-already-demo` address requires a domain owned by the project owner, rather than a rename that might break the live Telegram webhook.
 - One CSS-drawn character now travels above the Penalty Meter instead of sitting at both ends. Her expression follows the meter: extremely happy at 0%, annoyed as it moves toward the centre, most unhappy around 50%, then annoyed and finally extremely happy again once The Wife’s reward is unlocked. It intentionally depicts a generic character rather than claiming to portray a real person.
+
+## 21 July 2026 — Public Telegram-style task demo
+
+- The dashboard now includes a **Try it out** entry point to a Telegram-style group-chat simulation. Visitors can type a request as The Wife, let the existing GPT extraction route assess it, and see a high-confidence task land immediately in the dashboard.
+- The simulation is clearly disclosed as local-only: it never sends a Telegram message and never writes a visitor’s demonstration task into the shared Telegram database. Medium-confidence suggestions preserve the real product’s human-approval step.
