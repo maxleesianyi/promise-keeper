@@ -10,8 +10,9 @@
 6. Tap the theme icon, refresh, and confirm the theme choice is remembered on that device.
 7. Tap **Reset demo** and confirm the dashboard returns to its starter task state.
 8. Confirm **Try it out** sits outside the dashboard at its top-left. Tap it and confirm it is replaced by the chat in the same position. Write “Can you pack Jason’s swimming gear for tomorrow?”, and press **Enter**. Confirm the chat recognises the task and saves it into **Don’t forget ah**. Tap the Telegram header to restore **Try it out**.
-9. Confirm the chat header uses the mildly annoyed wife character from the Penalty Meter.
-10. On a wider browser, confirm the theme and **Reset demo** controls sit in a rail immediately to the right of the dashboard. On a narrow screen, confirm they remain outside the dashboard in a right-aligned strip above it.
+9. Send ordinary chat with no task, such as “Haha that was funny.” Confirm it remains a normal chat message without a “no promise” status card.
+10. Confirm the chat header uses the mildly annoyed wife character from the Penalty Meter.
+11. On a wider browser, confirm the theme and **Reset demo** controls sit in a rail immediately to the right of the dashboard. On a narrow screen, confirm they remain outside the dashboard in a right-aligned strip above it.
 
 ## Telegram demo — optional configured path
 

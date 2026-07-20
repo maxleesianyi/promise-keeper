@@ -110,3 +110,4 @@ The source code and interaction flow are complete. The first local build verific
 
 - The light/dark and Reset demo controls now sit outside the dashboard: in a compact rail to its right when there is room, and in a small right-aligned strip above it on narrow screens. This clears the dashboard’s top edge so its content begins higher.
 - **Try it out** is now an equally external, left-aligned control. When opened, it is replaced by the companion Telegram chat in the same location; the full Telegram header is the close control, restoring the compact button.
+- An unclear demo-chat message stays as an ordinary message without a dead-end “no promise” status card. Real service failures still receive a recovery message.

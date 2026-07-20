@@ -361,11 +361,12 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message }),
       });
-      const payload = await response.json() as { promise?: ExtractedDemoPromise; message?: string };
-      if (!response.ok || !payload.promise || payload.promise.confidence === "Low") {
-        setDemoChatMessages((current) => [...current, { id: `demo-no-task-${sentId}`, kind: "status", text: payload.message || "No clear task found. Try a specific request with an action." }]);
+      const payload = await response.json() as { promise?: ExtractedDemoPromise };
+      if (!payload.promise || payload.promise.confidence === "Low") {
+        if (!response.ok && response.status >= 500) throw new Error("Task extraction is unavailable");
         return;
       }
+      if (!response.ok) throw new Error("Task extraction failed");
 
       const task = makeDemoTask(payload.promise);
       if (task.confidence === "High") {
